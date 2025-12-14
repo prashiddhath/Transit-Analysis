@@ -1,44 +1,44 @@
 scenario_type,failure_prob,run,failed_count,failed_stations
-random,0.05,0.0,2,S+U Innsbrucker Platz Bstggl.2; S+U Zoologischer Garten
-random,0.05,1.0,2,S+U Rathaus Steglitz Bstggl.1; S+U Wittenau Bstggl.1
-random,0.05,2.0,2,U Rudow Bstggl.1; U Stadtmitte Bstggl.1
-random,0.05,3.0,2,U Kottbusser Tor; U Prinzenstr. Bstggl.1
-random,0.05,4.0,2,U Leopoldplatz U9 Bstggl.1; U Ruhleben Bstggl.2
-random,0.05,5.0,2,S+U Zoologischer Garten; U Mehringdamm Bstggl.1
-random,0.05,6.0,2,S+U Rathaus Spandau Bstggl.1; U Mehringdamm Bstggl.1
-random,0.05,7.0,2,U Osloer Str.; U Prinzenstr. Bstggl.1
-random,0.05,8.0,2,U Alt-Mariendorf Bstggl.1; U Kurfürstenstr. Bstggl.1
-random,0.05,9.0,2,S+U Zoologischer Garten; U Mehringdamm Bstggl.1
-random,0.1,0.0,4,S+U Alexanderplatz Bstggl.1; U Augsburger Str. Bstggl.1; U Kurt-Schumacher-Platz Bstggl.1; U Osloer Str.
-random,0.1,1.0,4,S+U Hauptbahnhof Bstggl.1; U Bayerischer Platz Bstggl.1; U Kurt-Schumacher-Platz Bstggl.1; U Schlesisches Tor Bstggl.1
-random,0.1,2.0,4,U Fehrbelliner Platz Bstggl.1; U Hallesches Tor; U Hermannplatz Bstggl.1; U Kurfürstendamm Bstggl.1
-random,0.1,3.0,4,U Augsburger Str. Bstggl.1; U Bayerischer Platz Bstggl.1; U Bismarckstr.; U Rudow Bstggl.1
-random,0.1,4.0,4,U Hallesches Tor; U Hermannplatz Bstggl.1; U Kurt-Schumacher-Platz Bstggl.1; U Mehringdamm Bstggl.1
-random,0.1,5.0,4,U Augsburger Str. Bstggl.1; U Gleisdreieck; U Möckernbrücke Bstggl.1; U Stadtmitte Bstggl.1
-random,0.1,6.0,4,U Alt-Mariendorf Bstggl.1; U Fehrbelliner Platz Bstggl.1; U Hohenzollernplatz Bstggl.1; U Möckernbrücke Bstggl.1
-random,0.1,7.0,4,S+U Rathaus Spandau Bstggl.1; U Hönow Bstggl.1; U Rudow Bstggl.1; U Ruhleben Bstggl.2
-random,0.1,8.0,4,S+U Alexanderplatz Bstggl.1; S+U Innsbrucker Platz Bstggl.2; S+U Rathaus Spandau Bstggl.1; U Bayerischer Platz Bstggl.1
-random,0.1,9.0,4,U Bayerischer Platz Bstggl.1; U Görlitzer Bahnhof Bstggl.1; U Rudow Bstggl.1; U Unter den Linden Bstggl.1
-random,0.15,0.0,6,S+U Rathaus Steglitz Bstggl.1; S+U Zoologischer Garten; U Gleisdreieck; U Leopoldplatz U9 Bstggl.1; U Nollendorfplatz; U Schlesisches Tor Bstggl.1
-random,0.15,1.0,6,U Hönow Bstggl.1; U Nollendorfplatz; U Schlesisches Tor Bstggl.1; U Spichernstr.; U Stadtmitte Bstggl.1; U Uhlandstr. Bstggl.1
-random,0.15,2.0,6,S+U Alexanderplatz Bstggl.1; S+U Innsbrucker Platz Bstggl.2; S+U Rathaus Spandau Bstggl.1; S+U Rathaus Steglitz Bstggl.1; U Kottbusser Tor; U Mehringdamm Bstggl.1
-random,0.15,3.0,6,U Fehrbelliner Platz Bstggl.1; U Hermannplatz Bstggl.1; U Krumme Lanke Bstggl.1; U Mehringdamm Bstggl.1; U Prinzenstr. Bstggl.1; U Stadtmitte Bstggl.1
-random,0.15,4.0,6,S+U Hauptbahnhof Bstggl.1; S+U Rathaus Steglitz Bstggl.1; U Alt-Mariendorf Bstggl.1; U Augsburger Str. Bstggl.1; U Hohenzollernplatz Bstggl.1; U Ruhleben Bstggl.2
-random,0.15,5.0,6,S+U Rathaus Spandau Bstggl.1; S+U Wittenau Bstggl.1; S+U Zoologischer Garten; U Hermannplatz Bstggl.1; U Prinzenstr. Bstggl.1; U Stadtmitte Bstggl.1
-random,0.15,6.0,6,S+U Rathaus Spandau Bstggl.1; S+U Rathaus Steglitz Bstggl.1; S+U Wittenau Bstggl.1; U Augsburger Str. Bstggl.1; U Fehrbelliner Platz Bstggl.1; U Rudow Bstggl.1
-random,0.15,7.0,6,S+U Wittenau Bstggl.1; U Berliner Str. Bstggl.1; U Hönow Bstggl.1; U Kottbusser Tor; U Möckernbrücke Bstggl.1; U Unter den Linden Bstggl.1
-random,0.15,8.0,6,S+U Alexanderplatz Bstggl.1; S+U Warschauer Str. Bstggl.1; U Bismarckstr.; U Hönow Bstggl.1; U Kurt-Schumacher-Platz Bstggl.1; U Rudow Bstggl.1
-random,0.15,9.0,6,S+U Pankow Bstggl.1; S+U Rathaus Steglitz Bstggl.1; U Berliner Str. Bstggl.1; U Gleisdreieck; U Hohenzollernplatz Bstggl.1; U Schlesisches Tor Bstggl.1
-random,0.2,0.0,8,S+U Alexanderplatz Bstggl.1; U Fehrbelliner Platz Bstggl.1; U Krumme Lanke Bstggl.1; U Kurt-Schumacher-Platz Bstggl.1; U Leopoldplatz U9 Bstggl.1; U Mehringdamm Bstggl.1; U Möckernbrücke Bstggl.1; U Schlesisches Tor Bstggl.1
-random,0.2,1.0,8,S+U Alexanderplatz Bstggl.1; S+U Rathaus Steglitz Bstggl.1; U Berliner Str. Bstggl.1; U Hermannplatz Bstggl.1; U Hönow Bstggl.1; U Leopoldplatz U9 Bstggl.1; U Nollendorfplatz; U Wittenbergplatz
-random,0.2,2.0,8,S+U Hauptbahnhof Bstggl.1; S+U Rathaus Steglitz Bstggl.1; S+U Warschauer Str. Bstggl.1; U Bayerischer Platz Bstggl.1; U Bismarckstr.; U Görlitzer Bahnhof Bstggl.1; U Hohenzollernplatz Bstggl.1; U Mehringdamm Bstggl.1
-random,0.2,3.0,8,S+U Rathaus Spandau Bstggl.1; S+U Zoologischer Garten; U Fehrbelliner Platz Bstggl.1; U Hohenzollernplatz Bstggl.1; U Kottbusser Tor; U Leopoldplatz U9 Bstggl.1; U Nollendorfplatz; U Rudow Bstggl.1
-random,0.2,4.0,8,S+U Rathaus Spandau Bstggl.1; S+U Wittenau Bstggl.1; U Gleisdreieck; U Hohenzollernplatz Bstggl.1; U Mehringdamm Bstggl.1; U Rudow Bstggl.1; U Schlesisches Tor Bstggl.1; U Uhlandstr. Bstggl.1
-random,0.2,5.0,8,S+U Hauptbahnhof Bstggl.1; S+U Zoologischer Garten; U Hallesches Tor; U Leopoldplatz U9 Bstggl.1; U Nollendorfplatz; U Ruhleben Bstggl.2; U Spichernstr.; U Wittenbergplatz
-random,0.2,6.0,8,S+U Alexanderplatz Bstggl.1; S+U Hermannstr. Bstggl.1; S+U Warschauer Str. Bstggl.1; S+U Zoologischer Garten; U Ruhleben Bstggl.2; U Spichernstr.; U Stadtmitte Bstggl.1; U Uhlandstr. Bstggl.1
-random,0.2,7.0,8,S+U Alexanderplatz Bstggl.1; S+U Zoologischer Garten; U Alt-Mariendorf Bstggl.1; U Augsburger Str. Bstggl.1; U Fehrbelliner Platz Bstggl.1; U Kottbusser Tor; U Möckernbrücke Bstggl.1; U Rudow Bstggl.1
-random,0.2,8.0,8,S+U Hauptbahnhof Bstggl.1; S+U Warschauer Str. Bstggl.1; U Bayerischer Platz Bstggl.1; U Berliner Str. Bstggl.1; U Hermannplatz Bstggl.1; U Mehringdamm Bstggl.1; U Schlesisches Tor Bstggl.1; U Uhlandstr. Bstggl.1
-random,0.2,9.0,8,U Bayerischer Platz Bstggl.1; U Fehrbelliner Platz Bstggl.1; U Hallesches Tor; U Kurfürstenstr. Bstggl.1; U Kurt-Schumacher-Platz Bstggl.1; U Leopoldplatz U9 Bstggl.1; U Ruhleben Bstggl.2; U Unter den Linden Bstggl.1
+random,0.05,0.0,2,S+U Innsbrucker Platz Bstggl.2; S+U Wittenau Bstggl.1
+random,0.05,1.0,2,S+U Alexanderplatz Bstggl.1; U Bismarckstr.
+random,0.05,2.0,2,U Hermannplatz Bstggl.1; U Kottbusser Tor
+random,0.05,3.0,2,S+U Warschauer Str. Bstggl.1; U Wittenbergplatz
+random,0.05,4.0,2,U Bayerischer Platz Bstggl.1; U Hallesches Tor
+random,0.05,5.0,2,S+U Hauptbahnhof Bstggl.1; U Hallesches Tor
+random,0.05,6.0,2,U Alt-Mariendorf Bstggl.1; U Uhlandstr. Bstggl.1
+random,0.05,7.0,2,U Augsburger Str. Bstggl.1; U Nollendorfplatz
+random,0.05,8.0,2,U Augsburger Str. Bstggl.1; U Uhlandstr. Bstggl.1
+random,0.05,9.0,2,U Hermannplatz Bstggl.1; U Rudow Bstggl.1
+random,0.1,0.0,4,S+U Pankow Bstggl.1; U Hermannplatz Bstggl.1; U Rudow Bstggl.1; U Ruhleben Bstggl.2
+random,0.1,1.0,4,S+U Innsbrucker Platz Bstggl.2; U Hohenzollernplatz Bstggl.1; U Hönow Bstggl.1; U Osloer Str.
+random,0.1,2.0,4,S+U Warschauer Str. Bstggl.1; U Bayerischer Platz Bstggl.1; U Gleisdreieck; U Hohenzollernplatz Bstggl.1
+random,0.1,3.0,4,U Alt-Mariendorf Bstggl.1; U Leopoldplatz U9 Bstggl.1; U Nollendorfplatz; U Schlesisches Tor Bstggl.1
+random,0.1,4.0,4,S+U Innsbrucker Platz Bstggl.2; S+U Pankow Bstggl.1; U Berliner Str. Bstggl.1; U Hallesches Tor
+random,0.1,5.0,4,U Alt-Mariendorf Bstggl.1; U Hermannplatz Bstggl.1; U Krumme Lanke Bstggl.1; U Spichernstr.
+random,0.1,6.0,4,S+U Warschauer Str. Bstggl.1; U Bismarckstr.; U Kurt-Schumacher-Platz Bstggl.1; U Ruhleben Bstggl.2
+random,0.1,7.0,4,U Augsburger Str. Bstggl.1; U Fehrbelliner Platz Bstggl.1; U Mehringdamm Bstggl.1; U Rudow Bstggl.1
+random,0.1,8.0,4,S+U Rathaus Spandau Bstggl.1; U Augsburger Str. Bstggl.1; U Gleisdreieck; U Kurt-Schumacher-Platz Bstggl.1
+random,0.1,9.0,4,S+U Alexanderplatz Bstggl.1; U Augsburger Str. Bstggl.1; U Bayerischer Platz Bstggl.1; U Kurfürstenstr. Bstggl.1
+random,0.15,0.0,6,S+U Pankow Bstggl.1; U Hohenzollernplatz Bstggl.1; U Krumme Lanke Bstggl.1; U Kurfürstendamm Bstggl.1; U Mehringdamm Bstggl.1; U Möckernbrücke Bstggl.1
+random,0.15,1.0,6,U Gleisdreieck; U Görlitzer Bahnhof Bstggl.1; U Hohenzollernplatz Bstggl.1; U Möckernbrücke Bstggl.1; U Schlesisches Tor Bstggl.1; U Unter den Linden Bstggl.1
+random,0.15,2.0,6,S+U Pankow Bstggl.1; S+U Wittenau Bstggl.1; U Augsburger Str. Bstggl.1; U Bismarckstr.; U Hohenzollernplatz Bstggl.1; U Rudow Bstggl.1
+random,0.15,3.0,6,U Görlitzer Bahnhof Bstggl.1; U Hallesches Tor; U Hohenzollernplatz Bstggl.1; U Hönow Bstggl.1; U Spichernstr.; U Unter den Linden Bstggl.1
+random,0.15,4.0,6,S+U Innsbrucker Platz Bstggl.2; S+U Warschauer Str. Bstggl.1; U Berliner Str. Bstggl.1; U Hohenzollernplatz Bstggl.1; U Prinzenstr. Bstggl.1; U Spichernstr.
+random,0.15,5.0,6,S+U Alexanderplatz Bstggl.1; S+U Rathaus Steglitz Bstggl.1; U Alt-Mariendorf Bstggl.1; U Augsburger Str. Bstggl.1; U Hohenzollernplatz Bstggl.1; U Krumme Lanke Bstggl.1
+random,0.15,6.0,6,S+U Wittenau Bstggl.1; S+U Zoologischer Garten; U Görlitzer Bahnhof Bstggl.1; U Krumme Lanke Bstggl.1; U Ruhleben Bstggl.2; U Stadtmitte Bstggl.1
+random,0.15,7.0,6,S+U Hauptbahnhof Bstggl.1; S+U Rathaus Spandau Bstggl.1; S+U Warschauer Str. Bstggl.1; U Kurfürstendamm Bstggl.1; U Möckernbrücke Bstggl.1; U Rudow Bstggl.1
+random,0.15,8.0,6,S+U Hauptbahnhof Bstggl.1; S+U Hermannstr. Bstggl.1; S+U Pankow Bstggl.1; S+U Wittenau Bstggl.1; U Görlitzer Bahnhof Bstggl.1; U Rudow Bstggl.1
+random,0.15,9.0,6,U Augsburger Str. Bstggl.1; U Hermannplatz Bstggl.1; U Hönow Bstggl.1; U Kottbusser Tor; U Leopoldplatz U9 Bstggl.1; U Spichernstr.
+random,0.2,0.0,8,S+U Wittenau Bstggl.1; U Hallesches Tor; U Kurfürstenstr. Bstggl.1; U Kurt-Schumacher-Platz Bstggl.1; U Schlesisches Tor Bstggl.1; U Stadtmitte Bstggl.1; U Uhlandstr. Bstggl.1; U Unter den Linden Bstggl.1
+random,0.2,1.0,8,S+U Hauptbahnhof Bstggl.1; S+U Rathaus Steglitz Bstggl.1; U Hermannplatz Bstggl.1; U Hönow Bstggl.1; U Kurt-Schumacher-Platz Bstggl.1; U Mehringdamm Bstggl.1; U Nollendorfplatz; U Spichernstr.
+random,0.2,2.0,8,S+U Pankow Bstggl.1; S+U Rathaus Steglitz Bstggl.1; S+U Warschauer Str. Bstggl.1; U Hohenzollernplatz Bstggl.1; U Krumme Lanke Bstggl.1; U Leopoldplatz U9 Bstggl.1; U Möckernbrücke Bstggl.1; U Prinzenstr. Bstggl.1
+random,0.2,3.0,8,S+U Wittenau Bstggl.1; U Bayerischer Platz Bstggl.1; U Berliner Str. Bstggl.1; U Kurfürstendamm Bstggl.1; U Möckernbrücke Bstggl.1; U Nollendorfplatz; U Ruhleben Bstggl.2; U Spichernstr.
+random,0.2,4.0,8,S+U Warschauer Str. Bstggl.1; U Alt-Mariendorf Bstggl.1; U Hallesches Tor; U Kurt-Schumacher-Platz Bstggl.1; U Leopoldplatz U9 Bstggl.1; U Osloer Str.; U Rudow Bstggl.1; U Uhlandstr. Bstggl.1
+random,0.2,5.0,8,S+U Wittenau Bstggl.1; U Augsburger Str. Bstggl.1; U Bismarckstr.; U Fehrbelliner Platz Bstggl.1; U Möckernbrücke Bstggl.1; U Osloer Str.; U Rudow Bstggl.1; U Unter den Linden Bstggl.1
+random,0.2,6.0,8,U Alt-Mariendorf Bstggl.1; U Kurfürstendamm Bstggl.1; U Kurfürstenstr. Bstggl.1; U Mehringdamm Bstggl.1; U Osloer Str.; U Prinzenstr. Bstggl.1; U Ruhleben Bstggl.2; U Schlesisches Tor Bstggl.1
+random,0.2,7.0,8,S+U Warschauer Str. Bstggl.1; U Berliner Str. Bstggl.1; U Görlitzer Bahnhof Bstggl.1; U Kurfürstenstr. Bstggl.1; U Mehringdamm Bstggl.1; U Ruhleben Bstggl.2; U Spichernstr.; U Stadtmitte Bstggl.1
+random,0.2,8.0,8,S+U Alexanderplatz Bstggl.1; S+U Hauptbahnhof Bstggl.1; S+U Rathaus Spandau Bstggl.1; S+U Wittenau Bstggl.1; U Hermannplatz Bstggl.1; U Kottbusser Tor; U Kurfürstendamm Bstggl.1; U Leopoldplatz U9 Bstggl.1
+random,0.2,9.0,8,S+U Alexanderplatz Bstggl.1; S+U Innsbrucker Platz Bstggl.2; U Hermannplatz Bstggl.1; U Hönow Bstggl.1; U Kurfürstenstr. Bstggl.1; U Spichernstr.; U Uhlandstr. Bstggl.1; U Wittenbergplatz
 degree,,,1,S+U Alexanderplatz Bstggl.1
 degree,,,2,S+U Alexanderplatz Bstggl.1; S+U Zoologischer Garten
 degree,,,3,S+U Alexanderplatz Bstggl.1; S+U Zoologischer Garten; U Bayerischer Platz Bstggl.1

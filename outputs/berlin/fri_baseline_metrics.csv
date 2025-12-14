@@ -1,2 +1,2 @@
-sigma,tau,rho,v,v_t,v_e,e,e_s,e_m,delta,A,L,baseline_bpc
-0.14968350647709217,4.5,0.8518518518518519,41,27,14,68,54,14,2,892,153.2654519824941,222.42227505728505
+sigma,tau_by_transfers,tau_by_trains,tau,rho,delta_transfers,delta_trains,delta,v,v_t,v_e,e,e_s,e_m,A,L,baseline_bpc
+0.14968350647709217,4.5,3.0,3.0,0.8518518518518519,2,3,3,41,27,14,68,54,14,892,153.2654519824941,211.05377505728507

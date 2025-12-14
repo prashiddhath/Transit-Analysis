@@ -35,7 +35,7 @@ BERLIN_POPULATION = 3_850_000  # Population of Berlin
 BERLIN_AREA_KM2 = 892  # Area in km²
 
 # SME parameters
-SME_TIME_THRESHOLDS = [20, 30, 45, 60, 75, 90, 120] # Time thresholds in minutes (60 for 100% coverage)
+SME_TIME_THRESHOLDS = [20, 30, 45, 60, 75, 90] # Time thresholds in minutes (60 for 100% coverage)
 
 # FRI disruption scenarios
 RANDOM_FAILURE_PROBS = [0.05, 0.10, 0.15, 0.20]  # Probabilities for random failures
@@ -633,9 +633,11 @@ def compute_derrible_kennedy_indicators(G, topology, total_length, num_lines):
                     tgt_lines = G.nodes[tgt].get('lines', set())
                     print(f"      {src_name} (lines: {src_lines}) → {tgt_name} (lines: {tgt_lines}): {trans} transfers")
             
-            delta = max_transfers
+            delta_transfers = max_transfers
+            delta_trains = delta_transfers + 1
         else:
-            delta = 0
+            delta_transfers = 0
+            delta_trains = 1
     else:
         # If not connected, calculate δ on the largest connected component
         print(f"\n  WARNING: FRI graph is NOT CONNECTED!")
@@ -666,12 +668,15 @@ def compute_derrible_kennedy_indicators(G, topology, total_length, num_lines):
                 for target in relevant_nodes[i+1:]:
                     transfers = count_min_transfers_bfs(G_main, source, target)
                     max_transfers = max(max_transfers, transfers)
-            delta = max_transfers
+            delta_transfers = max_transfers
+            delta_trains = delta_transfers + 1
         else:
-            delta = 0
+            delta_transfers = 0
+            delta_trains = 1
     
     # Directness: τ = n_L / δ (Derrible & Kennedy equation 11)
-    tau = num_lines / delta if delta > 0 else 1.0
+    tau_by_transfers = num_lines / delta_transfers if delta_transfers > 0 else float('inf')
+    tau_by_trains = num_lines / delta_trains if delta_trains > 0 else 1.0
     
     # 3. Connectivity (ρ)
     # ρ = (v_c^t - e^m) / v^t  (Derrible & Kennedy equation 13)
@@ -702,15 +707,19 @@ def compute_derrible_kennedy_indicators(G, topology, total_length, num_lines):
     
     return {
         'sigma': sigma,
-        'tau': tau,
+        'tau_by_transfers': tau_by_transfers,
+        'tau_by_trains': tau_by_trains,
+        'tau': tau_by_trains,
         'rho': rho,
+        'delta_transfers': delta_transfers,
+        'delta_trains': delta_trains,
+        'delta': delta_trains, # 'delta' now refers to delta_trains for consistency with tau
         'v': v,
         'v_t': v_t,
         'v_e': v_e,
         'e': e,
         'e_s': e_s,
         'e_m': e_m,
-        'delta': delta,
         'A': A,
         'L': total_length
     }
@@ -743,8 +752,9 @@ def compute_fri_baseline(G, topology, total_length, num_lines):
     
     print(f"\nDerrible & Kennedy Indicators:")
     print(f"  Coverage (σ): {indicators['sigma']:.4f}")
-    print(f"  Directness (τ): {indicators['tau']:.4f}")
-    print(f"    - Max transfers (δ): {indicators['delta']}")
+    print(f"  Directness (τ):")
+    print(f"    - By transfers: τ = {indicators['tau_by_transfers']:.4f} (δ = {indicators['delta_transfers']} transfers)")
+    print(f"    - By trains: τ = {indicators['tau_by_trains']:.4f} (δ = {indicators['delta_trains']} trains)")
     print(f"    - Number of lines: {num_lines}")
     print(f"  Connectivity (ρ): {indicators['rho']:.4f}")
     
@@ -797,6 +807,7 @@ def compute_fri(G_baseline, G_full, topology, stations_df, total_length, num_lin
     failed_stations_log = []  # Track which stations were removed in each scenario
     
     all_stations = list(G_baseline.nodes())
+    total_stations_full = len(stations_df)  # Total stations for percentage calculation
     
     # 1. Random failures
     print("\n1. Random Station Failures")
@@ -817,14 +828,16 @@ def compute_fri(G_baseline, G_full, topology, stations_df, total_length, num_lin
                 indicators = compute_derrible_kennedy_indicators(
                     G_disrupted, new_topology, new_length, num_lines
                 )
-                bpc = predict_boardings_per_capita(indicators['sigma'], indicators['tau'], indicators['rho'])
+                bpc_by_transfers = predict_boardings_per_capita(indicators['sigma'], indicators['tau_by_transfers'], indicators['rho'])
+                bpc_by_trains = predict_boardings_per_capita(indicators['sigma'], indicators['tau_by_trains'], indicators['rho'])
                 
                 # Apply fragmentation penalty: penalize if network fragments
                 baseline_nodes = len(all_stations)
                 remaining_nodes = G_disrupted.number_of_nodes()
                 fragmentation_penalty = remaining_nodes / baseline_nodes if baseline_nodes > 0 else 0
                 
-                performance_ratio = (bpc / baseline_bpc * fragmentation_penalty) if baseline_bpc > 0 else 0
+                performance_ratio_by_transfers = (bpc_by_transfers / baseline_bpc * fragmentation_penalty) if baseline_bpc > 0 else 0
+                performance_ratio_by_trains = (bpc_by_trains / baseline_bpc * fragmentation_penalty) if baseline_bpc > 0 else 0
                 
                 # Count isolated stations (in components other than largest)
                 if not nx.is_connected(G_disrupted):
@@ -855,8 +868,8 @@ def compute_fri(G_baseline, G_full, topology, stations_df, total_length, num_lin
                             if n > 1:
                                 reachable_pairs += n * (n - 1) / 2
                     
-                    # Calculate as % of original network (170 stations = 14,365 pairs)
-                    total_original_pairs = 170 * 169 / 2
+                    # Calculate as % of original network
+                    total_original_pairs = total_stations_full * (total_stations_full - 1) / 2
                     reachable_pct = (reachable_pairs / total_original_pairs) * 100
             else:
                 performance_ratio = 0
@@ -868,7 +881,8 @@ def compute_fri(G_baseline, G_full, topology, stations_df, total_length, num_lin
                 'prob': prob,
                 'run': run,
                 'failed_count': len(failed),
-                'performance_ratio': performance_ratio,
+                'performance_ratio_by_transfers': performance_ratio_by_transfers,
+                'performance_ratio_by_trains': performance_ratio_by_trains,
                 'isolated_stations': isolated_count,
                 'reachable_pct': reachable_pct
             })
@@ -902,14 +916,16 @@ def compute_fri(G_baseline, G_full, topology, stations_df, total_length, num_lin
             indicators = compute_derrible_kennedy_indicators(
                 G_disrupted, new_topology, new_length, num_lines
             )
-            bpc = predict_boardings_per_capita(indicators['sigma'], indicators['tau'], indicators['rho'])
+            bpc_by_transfers = predict_boardings_per_capita(indicators['sigma'], indicators['tau_by_transfers'], indicators['rho'])
+            bpc_by_trains = predict_boardings_per_capita(indicators['sigma'], indicators['tau_by_trains'], indicators['rho'])
             
             # Apply fragmentation penalty
             baseline_nodes = len(all_stations)
             remaining_nodes = G_disrupted.number_of_nodes()
             fragmentation_penalty = remaining_nodes / baseline_nodes if baseline_nodes > 0 else 0
             
-            performance_ratio = (bpc / baseline_bpc * fragmentation_penalty) if baseline_bpc > 0 else 0
+            performance_ratio_by_transfers = (bpc_by_transfers / baseline_bpc * fragmentation_penalty) if baseline_bpc > 0 else 0
+            performance_ratio_by_trains = (bpc_by_trains / baseline_bpc * fragmentation_penalty) if baseline_bpc > 0 else 0
             
             # Count isolated stations
             if not nx.is_connected(G_disrupted):
@@ -934,17 +950,19 @@ def compute_fri(G_baseline, G_full, topology, stations_df, total_length, num_lin
                         n = len(comp)
                         if n > 1:
                             reachable_pairs += n * (n - 1) / 2
-                total_original_pairs = 170 * 169 / 2
+                total_original_pairs = total_stations_full * (total_stations_full - 1) / 2
                 reachable_pct = (reachable_pairs / total_original_pairs) * 100
         else:
-            performance_ratio = 0
+            performance_ratio_by_transfers = 0
+            performance_ratio_by_trains = 0
             isolated_count = k
             reachable_pct = 0
         
         scenarios.append({
             'type': 'degree',
             'failed_count': k,
-            'performance_ratio': performance_ratio,
+            'performance_ratio_by_transfers': performance_ratio_by_transfers,
+            'performance_ratio_by_trains': performance_ratio_by_trains,
             'isolated_stations': isolated_count,
             'reachable_pct': reachable_pct
         })
@@ -979,14 +997,16 @@ def compute_fri(G_baseline, G_full, topology, stations_df, total_length, num_lin
                 indicators = compute_derrible_kennedy_indicators(
                     G_disrupted, new_topology, new_length, num_lines
                 )
-                bpc = predict_boardings_per_capita(indicators['sigma'], indicators['tau'], indicators['rho'])
+                bpc_by_transfers = predict_boardings_per_capita(indicators['sigma'], indicators['tau_by_transfers'], indicators['rho'])
+                bpc_by_trains = predict_boardings_per_capita(indicators['sigma'], indicators['tau_by_trains'], indicators['rho'])
                 
                 # Apply fragmentation penalty
                 baseline_nodes = len(all_stations)
                 remaining_nodes = G_disrupted.number_of_nodes()
                 fragmentation_penalty = remaining_nodes / baseline_nodes if baseline_nodes > 0 else 0
                 
-                performance_ratio = (bpc / baseline_bpc * fragmentation_penalty) if baseline_bpc > 0 else 0
+                performance_ratio_by_transfers = (bpc_by_transfers / baseline_bpc * fragmentation_penalty) if baseline_bpc > 0 else 0
+                performance_ratio_by_trains = (bpc_by_trains / baseline_bpc * fragmentation_penalty) if baseline_bpc > 0 else 0
                 
                 # Count isolated stations
                 if not nx.is_connected(G_disrupted):
@@ -1011,17 +1031,19 @@ def compute_fri(G_baseline, G_full, topology, stations_df, total_length, num_lin
                             n = len(comp)
                             if n > 1:
                                 reachable_pairs += n * (n - 1) / 2
-                    total_original_pairs = 170 * 169 / 2
+                    total_original_pairs = total_stations_full * (total_stations_full - 1) / 2
                     reachable_pct = (reachable_pairs / total_original_pairs) * 100
             else:
-                performance_ratio = 0
+                performance_ratio_by_transfers = 0
+                performance_ratio_by_trains = 0
                 isolated_count = k
                 reachable_pct = 0
             
             scenarios.append({
                 'type': 'betweenness',
                 'failed_count': k,
-                'performance_ratio': performance_ratio,
+                'performance_ratio_by_transfers': performance_ratio_by_transfers,
+                'performance_ratio_by_trains': performance_ratio_by_trains,
                 'isolated_stations': isolated_count,
                 'reachable_pct': reachable_pct
             })
@@ -1039,11 +1061,11 @@ def compute_fri(G_baseline, G_full, topology, stations_df, total_length, num_lin
     # Calculate FRI for each scenario type
     scenarios_df = pd.DataFrame(scenarios)
     
-    # Overall FRI
-    fri_overall = scenarios_df['performance_ratio'].mean()
+    # Calculate FRI using the trains interpretation (default)
+    fri_overall = scenarios_df['performance_ratio_by_trains'].mean()
     
-    # FRI by type
-    fri_by_type = scenarios_df.groupby('type')['performance_ratio'].mean()
+    # Calculate FRI by scenario type
+    fri_by_type = scenarios_df.groupby('type')['performance_ratio_by_trains'].mean()
     
     print(f"\n{'Type':<20} {'FRI':<10}")
     print("-" * 30)
@@ -1176,9 +1198,11 @@ def compute_sme(G_full, stations_df, total_length):
             # Fallback: use average reachable stations as proxy
             reachable_area = avg_reachable_per_station * 2  # Assume 2 km² per station
         
-        # SME (area-based)
-        # SME = Reachable area / (Track length / Population)
-        sme = reachable_area / (total_length / BERLIN_POPULATION * 1000)  # Normalize
+        # SME (System-level Mobility Efficiency) - Area-based formula
+        # SME_A = A_T / (L · Pop)
+        # Where: A_T = reachable area (km²), L = track length (km), Pop = population (in millions)
+        pop_millions = BERLIN_POPULATION / 1_000_000
+        sme = reachable_area / (total_length * pop_millions)
         
         print(f"  Average reachable stations: {avg_reachable_per_station:.1f} / {len(stations_df)} ({reachability_pct:.1f}%)")
         print(f"  Median reachable: {median_reachable}")
@@ -1343,57 +1367,66 @@ def visualize_network_graph(G, stations_df, topology, output_path):
         print(f"  Saved {layout_name} layout to {layout_path}")
 
 
-def visualize_fri_resilience(scenarios_df, output_path):
-    """Visualize FRI resilience curves for different disruption scenarios"""
+def visualize_fri_resilience(scenarios_df, output_path, metric_type='transfers'):
+    """Visualize FRI resilience under different disruption scenarios
+    
+    Args:
+        scenarios_df: DataFrame with scenario results
+        output_path: Path to save visualization
+        metric_type: 'transfers' or 'trains' - which delta interpretation to use
+    """
     if not HAS_MATPLOTLIB:
         print("Matplotlib not available, skipping FRI visualization")
         return
     
     import matplotlib.pyplot as plt
     
+    # Select appropriate performance ratio column
+    perf_col = f'performance_ratio_by_{metric_type}'
+    
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
     
     # Plot 1: Random failures
     random_data = scenarios_df[scenarios_df['type'] == 'random'].copy()
-    if len(random_data) > 0:
-        grouped = random_data.groupby('prob')['performance_ratio'].agg(['mean', 'std'])
-        
-        ax1.errorbar(grouped.index * 100, grouped['mean'], yerr=grouped['std'],
+    if len(random_data) > 0 and perf_col in random_data.columns:
+        grouped = random_data.groupby('prob')[perf_col].agg(['mean', 'std'])
+        ax1.errorbar(grouped.index * 100, grouped['mean'], yerr=grouped['std'], 
                     marker='o', linewidth=2, markersize=8, capsize=5, 
                     color='#FF6B6B', label='Mean ± Std')
         ax1.fill_between(grouped.index * 100, grouped['mean'] - grouped['std'], 
                         grouped['mean'] + grouped['std'], alpha=0.2, color='#FF6B6B')
-        ax1.axhline(y=1.0, color='gray', linestyle='--', linewidth=2, alpha=0.7, label='Baseline (No Disruption)')
+        ax1.axhline(y=1.0, color='gray', linestyle='--', alpha=0.5, label='Baseline')
         ax1.set_xlabel('Failure Probability (%)', fontsize=12, fontweight='bold')
         ax1.set_ylabel('Performance Ratio', fontsize=12, fontweight='bold')
         ax1.set_title('Random Station Failures', fontsize=14, fontweight='bold')
         ax1.grid(True, alpha=0.3)
         ax1.legend(fontsize=10)
-        ax1.set_ylim(top=1.05)  # Set upper limit only
+        ax1.set_ylim([0.8, 1.05])
     
     # Plot 2: Targeted failures
     for scenario_type in ['degree', 'betweenness']:
         targeted_data = scenarios_df[scenarios_df['type'] == scenario_type].copy()
-        if len(targeted_data) > 0:
-            grouped = targeted_data.groupby('failed_count')['performance_ratio'].mean()
+        if len(targeted_data) > 0 and perf_col in targeted_data.columns:
+            grouped = targeted_data.groupby('failed_count')[perf_col].mean()
             color = '#4ECDC4' if scenario_type == 'degree' else '#FFD93D'
             ax2.plot(grouped.index, grouped.values, marker='o', linewidth=2, 
                     markersize=8, label=scenario_type.capitalize(), color=color)
+            ax2.fill_between(grouped.index, 0.8, grouped.values, alpha=0.1, color=color)
     
-    ax2.axhline(y=1.0, color='gray', linestyle='--', linewidth=2, alpha=0.7, label='Baseline')
+    ax2.axhline(y=1.0, color='gray', linestyle='--', alpha=0.5, label='Baseline')
     ax2.set_xlabel('Number of Stations Removed', fontsize=12, fontweight='bold')
     ax2.set_ylabel('Performance Ratio', fontsize=12, fontweight='bold')
     ax2.set_title('Targeted Station Failures', fontsize=14, fontweight='bold')
     ax2.grid(True, alpha=0.3)
     ax2.legend(fontsize=10)
-    ax2.set_ylim(top=1.05)  # Set upper limit only
+    ax2.set_ylim([0.8, 1.05])
     
-    plt.suptitle('Functional Resilience Index (FRI) - Network Performance Under Disruptions',
+    plt.suptitle(f'Functional Resilience Index (FRI) - Using δ_{metric_type}',
                 fontsize=16, fontweight='bold', y=1.02)
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"  Saved FRI resilience curves to {output_path}")
+    print(f"  Saved FRI resilience curves ({metric_type}) to {output_path}")
 
 
 def visualize_sme_analysis(sme_df, output_path):
@@ -1596,13 +1629,20 @@ def main():
     print("=" * 80)
     
     visualize_network_graph(G_fri, stations_df, topology, 
-                           os.path.join(OUTPUT_DIR, 'network_graph.png'))
+                           os.path.join(OUTPUT_DIR, 'ng_berlin.png'))
+    
+    # FRI Resilience plots - one for each delta interpretation
     visualize_fri_resilience(scenarios_df, 
-                           os.path.join(OUTPUT_DIR, 'fri_resilience_curves.png'))
+                            os.path.join(OUTPUT_DIR, 'fri_transfers_berlin.png'),
+                            metric_type='transfers')
+    visualize_fri_resilience(scenarios_df, 
+                            os.path.join(OUTPUT_DIR, 'fri_trains_berlin.png'),
+                            metric_type='trains')
+    
     visualize_sme_analysis(sme_df, 
-                          os.path.join(OUTPUT_DIR, 'sme_analysis.png'))
+                          os.path.join(OUTPUT_DIR, 'sme_berlin.png'))
     visualize_network_degradation(scenarios_df,
-                                  os.path.join(OUTPUT_DIR, 'network_degradation.png'))
+                                  os.path.join(OUTPUT_DIR, 'deg_berlin.png'))
     
     print("\n" + "=" * 80)
     print("ANALYSIS COMPLETE")
