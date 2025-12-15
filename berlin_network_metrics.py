@@ -1198,17 +1198,31 @@ def compute_sme(G_full, stations_df, total_length):
             # Fallback: use average reachable stations as proxy
             reachable_area = avg_reachable_per_station * 2  # Assume 2 km² per station
         
-        # SME (System-level Mobility Efficiency) - Area-based formula
-        # SME_A = A_T / (L · Pop)
-        # Where: A_T = reachable area (km²), L = track length (km), Pop = population (in millions)
+        # Calculate multiple SME metrics
         pop_millions = BERLIN_POPULATION / 1_000_000
-        sme = reachable_area / (total_length * pop_millions)
+        
+        # 1. Infrastructure Efficiency (IE): A_T / L
+        infrastructure_efficiency = reachable_area / total_length if total_length > 0 else 0
+        
+        # 2. Per-Capita Accessibility (PCA): A_T / P
+        per_capita_accessibility = reachable_area / pop_millions if pop_millions > 0 else 0
+        
+        # 3. Density-Normalized Coverage (DNC): (A_T / A_city) / (L / P)
+        coverage_fraction = reachable_area / BERLIN_AREA_KM2 if BERLIN_AREA_KM2 > 0 else 0
+        track_per_capita = total_length / pop_millions if pop_millions > 0 else 0
+        density_normalized_coverage = coverage_fraction / track_per_capita if track_per_capita > 0 else 0
+        
+        # 4. Legacy SME (for backward compatibility): A_T / (L × P)
+        sme_legacy = reachable_area / (total_length * pop_millions) if (total_length * pop_millions) > 0 else 0
         
         print(f"  Average reachable stations: {avg_reachable_per_station:.1f} / {len(stations_df)} ({reachability_pct:.1f}%)")
         print(f"  Median reachable: {median_reachable}")
         print(f"  Max travel time in network: {max_travel_time:.1f} min")
         print(f"  Estimated reachable area: {reachable_area:.2f} km²")
-        print(f"  SME: {sme:.2f}")
+        print(f"  Infrastructure Efficiency (IE): {infrastructure_efficiency:.2f} km²/track-km")
+        print(f"  Per-Capita Accessibility (PCA): {per_capita_accessibility:.2f} km²/M people")
+        print(f"  Density-Normalized Coverage (DNC): {density_normalized_coverage:.4f}")
+        print(f"  Legacy SME: {sme_legacy:.2f}")
         
         sme_results.append({
             'time_threshold': time_threshold,
@@ -1217,7 +1231,10 @@ def compute_sme(G_full, stations_df, total_length):
             'reachability_pct': reachability_pct,
             'max_travel_time': max_travel_time,
             'reachable_area_km2': reachable_area,
-            'sme': sme
+            'infrastructure_efficiency': infrastructure_efficiency,
+            'per_capita_accessibility': per_capita_accessibility,
+            'density_normalized_coverage': density_normalized_coverage,
+            'sme_legacy': sme_legacy
         })
     
     return pd.DataFrame(sme_results)
@@ -1399,11 +1416,19 @@ def visualize_fri_resilience(scenarios_df, output_path, metric_type='transfers')
         ax1.set_xlabel('Failure Probability (%)', fontsize=12, fontweight='bold')
         ax1.set_ylabel('Performance Ratio', fontsize=12, fontweight='bold')
         ax1.set_title('Random Station Failures', fontsize=14, fontweight='bold')
+        ax1.set_xlim([4, 21])  # Fixed x-axis: 5-20% failure probability
+        ax1.set_xticks([5, 10, 15, 20])
         ax1.grid(True, alpha=0.3)
         ax1.legend(fontsize=10)
-        ax1.set_ylim([0.8, 1.05])
+        
+        # Auto-scale y-axis with some padding
+        y_min = (grouped['mean'] - grouped['std']).min()
+        y_max = max((grouped['mean'] + grouped['std']).max(), 1.0)
+        y_padding = (y_max - y_min) * 0.1
+        ax1.set_ylim([max(0, y_min - y_padding), y_max + y_padding])
     
     # Plot 2: Targeted failures
+    all_values = []
     for scenario_type in ['degree', 'betweenness']:
         targeted_data = scenarios_df[scenarios_df['type'] == scenario_type].copy()
         if len(targeted_data) > 0 and perf_col in targeted_data.columns:
@@ -1411,15 +1436,21 @@ def visualize_fri_resilience(scenarios_df, output_path, metric_type='transfers')
             color = '#4ECDC4' if scenario_type == 'degree' else '#FFD93D'
             ax2.plot(grouped.index, grouped.values, marker='o', linewidth=2, 
                     markersize=8, label=scenario_type.capitalize(), color=color)
-            ax2.fill_between(grouped.index, 0.8, grouped.values, alpha=0.1, color=color)
+            all_values.extend(grouped.values)
     
-    ax2.axhline(y=1.0, color='gray', linestyle='--', alpha=0.5, label='Baseline')
-    ax2.set_xlabel('Number of Stations Removed', fontsize=12, fontweight='bold')
-    ax2.set_ylabel('Performance Ratio', fontsize=12, fontweight='bold')
-    ax2.set_title('Targeted Station Failures', fontsize=14, fontweight='bold')
-    ax2.grid(True, alpha=0.3)
-    ax2.legend(fontsize=10)
-    ax2.set_ylim([0.8, 1.05])
+    if all_values:
+        ax2.axhline(y=1.0, color='gray', linestyle='--', alpha=0.5, label='Baseline')
+        ax2.set_xlabel('Number of Stations Removed', fontsize=12, fontweight='bold')
+        ax2.set_ylabel('Performance Ratio', fontsize=12, fontweight='bold')
+        ax2.set_title('Targeted Station Failures', fontsize=14, fontweight='bold')
+        ax2.grid(True, alpha=0.3)
+        ax2.legend(fontsize=10)
+        
+        # Auto-scale y-axis with some padding
+        y_min = min(all_values)
+        y_max = max(max(all_values), 1.0)
+        y_padding = (y_max - y_min) * 0.1
+        ax2.set_ylim([max(0, y_min - y_padding), y_max + y_padding])
     
     plt.suptitle(f'Functional Resilience Index (FRI) - Using δ_{metric_type}',
                 fontsize=16, fontweight='bold', y=1.02)
@@ -1462,29 +1493,29 @@ def visualize_sme_analysis(sme_df, output_path):
     ax1.set_ylim([0, 110])  # Increased to prevent label overlap with top axis
     ax1.set_xticks(time_thresholds)
     
-    # Plot 2: SME values
-    sme_values = sme_df['sme'].values
+    # Plot 2: Infrastructure Efficiency values
+    ie_values = sme_df['infrastructure_efficiency'].values
     colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(time_thresholds)))
-    bars = ax2.bar(range(len(time_thresholds)), sme_values, color=colors, alpha=0.8, edgecolor='black', linewidth=1.5)
+    bars = ax2.bar(range(len(time_thresholds)), ie_values, color=colors, alpha=0.8, edgecolor='black', linewidth=1.5)
     
     # Add value labels with consistent offset
-    for i, (bar, val) in enumerate(zip(bars, sme_values)):
+    for i, (bar, val) in enumerate(zip(bars, ie_values)):
         height = bar.get_height()
         # Use smaller relative offset for consistency across cities
-        offset = max(sme_values) * 0.03
+        offset = max(ie_values) * 0.03
         ax2.text(bar.get_x() + bar.get_width()/2., height + offset,
                 f'{val:.2f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
     
     ax2.set_xlabel('Time Threshold (minutes)', fontsize=12, fontweight='bold')
-    ax2.set_ylabel('SME Value', fontsize=12, fontweight='bold')
-    ax2.set_title('System Level Mobility Efficiency (SME)', fontsize=14, fontweight='bold')
+    ax2.set_ylabel('Infrastructure Efficiency (km²/track-km)', fontsize=12, fontweight='bold')
+    ax2.set_title('Infrastructure Efficiency (IE)', fontsize=14, fontweight='bold')
     ax2.set_xticks(range(len(time_thresholds)))
     ax2.set_xticklabels([f'{t} min' for t in time_thresholds])
     ax2.grid(True, alpha=0.3, axis='y')
     # Increase y-limit to prevent text overlap with top of plot
-    ax2.set_ylim([0, max(sme_values) * 1.15])
+    ax2.set_ylim([0, max(ie_values) * 1.15])
     
-    plt.suptitle('SME Analysis - Network Accessibility and Mobility Efficiency',
+    plt.suptitle('SME Analysis - Network Accessibility and Infrastructure Efficiency',
                 fontsize=16, fontweight='bold', y=1.02)
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
@@ -1619,9 +1650,9 @@ def main():
     for scenario_type, fri_value in fri_by_type.items():
         print(f"  FRI ({scenario_type}): {fri_value:.4f}")
     
-    print(f"\nSME (System Level Mobility Efficiency):")
+    print(f"\nInfrastructure Efficiency (IE):")
     for _, row in sme_df.iterrows():
-        print(f"  SME @ {row['time_threshold']} min: {row['sme']:.2f}")
+        print(f"  IE @ {row['time_threshold']} min: {row['infrastructure_efficiency']:.2f} km²/track-km")
     
     # === VISUALIZATIONS ===
     print("\n" + "=" * 80)

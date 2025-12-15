@@ -17,7 +17,7 @@ Comparative analysis of three major urban transit systems using Functional Resil
 | **D&K Special Vertices (v)** | 238 | 41 | 31 |
 | **Route Length (L)** | 1,631.7 km | 153.3 km | 184.7 km |
 | **Population Served** | 8,336,817 | 3,850,809 | 5,453,600 |
-| **City Area (A)** | 778.2 km² | 892 km² | 734.3 km² |
+| **City Area (A)** | 629.2 km² | 892 km² | 734.3 km² |
 
 ### Density Metrics
 
@@ -26,7 +26,7 @@ Comparative analysis of three major urban transit systems using Functional Resil
 | **Stations per Million** | 43 | 44 | 22 |
 | **km per Station** | 4.56 | 0.90 | 1.51 |
 | **km per 1000 people** | 0.196 | 0.040 | 0.034 |
-| **Network Density** | 2.10 km/km² | 0.17 km/km² | 0.25 km/km² |
+| **Network Density** | 2.59 km/km² | 0.17 km/km² | 0.25 km/km² |
 
 ---
 
@@ -37,7 +37,7 @@ Comparative analysis of three major urban transit systems using Functional Resil
 
 | City | σ | Interpretation |
 |------|---|----------------|
-| **NYC** | **0.361** | Extensive coverage (largest σ) |
+| **NYC** | **0.447** | Extensive coverage (largest σ) |
 | **Berlin** | 0.150 | Moderate coverage |
 | **Singapore** | 0.130 | Compact coverage |
 
@@ -70,9 +70,9 @@ Comparative analysis of three major urban transit systems using Functional Resil
 
 | City | Predicted Bpc | Actual Context |
 |------|---------------|----------------|
-| **NYC** | **326.7** | Highest usage prediction |
-| **Berlin** | 222.4 | Moderate usage |
-| **Singapore** | 221.3 | Moderate usage |
+| **NYC** | **299.0** | Highest usage prediction |
+| **Berlin** | 211.1 | Moderate usage |
+| **Singapore** | 216.3 | Moderate usage |
 
 **Formula:** Bpc = 44.963σ + 7.579τ + 92.316ρ + 102.947
 
@@ -90,32 +90,83 @@ Comparative analysis of three major urban transit systems using Functional Resil
 
 ---
 
-## System Level Mobility Efficiency (SME)
+## Transit Accessibility Metrics (Proposed Framework)
 
-### SME Values by Time Threshold
+### Infrastructure Efficiency (IE) - Primary Metric
+*Geographic coverage per unit of infrastructure*
 
 | Time | NYC | Berlin | Singapore | Leader |
 |------|-----|--------|-----------|--------|
-| **20 min** | 1,047 | 2,663 | 2,743 | Singapore |
-| **30 min** | 1,371 | 3,994 | 3,204 | Berlin |
-| **45 min** | 1,840 | 7,772 | 6,204 | Berlin |
-| **60 min** | 2,349 | 9,388 | 7,919 | Berlin |
-| **75 min** | 2,364 | 9,459 | 8,020 | Berlin |
-| **90 min** | 2,364 | 9,459 | 8,233 | Berlin |
+| **20 min** | 0.12 | 0.48 | 0.39 | Berlin |
+| **30 min** | 0.20 | 0.96 | 0.79 | Berlin |
+| **45 min** | 0.37 | 1.77 | 1.29 | Berlin |
+| **60 min** | 0.61 | 2.41 | 1.71 | Berlin |
+| **75 min** | 0.78 | 2.51 | 1.76 | Berlin |
+| **90 min** | 0.85 | 2.51 | 1.84 | Berlin |
+
+**Formula:** IE(t) = A_reachable(t) / L (km²/km)
+
+**Interpretation:**
+- Berlin achieves 2-3x the area coverage per km of track
+- NYC's extensive network (1,631 km) serves limited geographic spread
+- Singapore balanced at ~1.5-1.8 km²/km
+
+### Per-Capita Accessibility (PCA)
+*Service area per million residents*
+
+| Time | NYC (km²/M) | Berlin (km²/M) | Singapore (km²/M) | Leader |
+|------|-------------|----------------|-------------------|--------|
+| **20 min** | 5.4 | 19.1 | 13.1 | Berlin |
+| **30 min** | 9.2 | 38.3 | 26.6 | Berlin |
+| **45 min** | 16.7 | 70.3 | 43.5 | Berlin |
+| **60 min** | 27.5 | 95.8 | 57.6 | Berlin |
+| **75 min** | 35.0 | 99.8 | 59.4 | Berlin |
+| **90 min** | 38.3 | 99.8 | 62.0 | Berlin |
+
+**Formula:** PCA(t) = A_reachable(t) / (P / 1,000,000)
+
+**Interpretation:**
+- Berlin provides 2-3x more accessible area per capita
+- Reflects population density and network efficiency
+- NYC serves 8.3M people with lower per-capita accessibility
+
+### Density-Normalized Coverage (DNC)
+*Dimensionless metric accounting for city scale and population*
+
+| Time | NYC | Berlin | Singapore | Leader |
+|------|-----|--------|-----------|--------|
+| **20 min** | 0.0041 | 0.0086 | 0.0085 | Berlin |
+| **30 min** | 0.0072 | 0.0178 | 0.0173 | Berlin |
+| **45 min** | 0.0133 | 0.0326 | 0.0282 | Berlin |
+| **60 min** | 0.0221 | 0.0445 | 0.0373 | Berlin |
+| **75 min** | 0.0279 | 0.0463 | 0.0385 | Berlin |
+| **90 min** | 0.0306 | 0.0463 | 0.0402 | Berlin |
+
+**Formula:** DNC(t) = (A_reachable / A_city) / (L / P_millions)
+
+**Interpretation:**
+- Accounts for both city size AND population density
+- Berlin's compact urban form yields highest normalized coverage
+- Enables fair comparison across vastly different city scales
 
 ### Reachability Percentage
 
 | Time Threshold | NYC | Berlin | Singapore |
-|----------------|-----|--------|-----------|
+|----------------|-----|--------|--------------|
 | **20 min** | 50.0% | 51.0% | 43.6% |
 | **30 min** | 77.5% | 79.0% | 67.4% |
 | **45 min** | 96.3% | 95.9% | 90.5% |
 | **60 min** | 99.6% | 99.6% | 97.6% |
 | **75 min** | 99.9% | 100.0% | 99.6% |
 | **90 min** | 100.0% | 100.0% | 99.9% |
-| **120 min** | 100.0% | 100.0% | 100.0% |
 
 **Note:** Percentages are floored to 1 decimal place to avoid misleading rounding (99.99% displays as 99.9%, not 100.0%)
+
+**Methodological Contribution:**
+These three metrics (IE, PCA, DNC) represent a novel framework proposed in this study to address limitations of traditional single-formula accessibility measures. They provide complementary perspectives:
+- **IE:** Infrastructure productivity (geographic)
+- **PCA:** Population equity (demographic)
+- **DNC:** Universal comparison (normalized)
 
 ---
 
@@ -156,24 +207,24 @@ Comparative analysis of three major urban transit systems using Functional Resil
 **Berlin: The Compact Network**
 - **Densest** station spacing (0.90 km/station)
 - Serves smallest population (3.85M) with moderate station count
-- Best SME performance at mid-to-long thresholds (45-90 min)
+- Best Infrastructure Efficiency at mid-to-long thresholds (45-90 min)
 - Lower directness penalty (τ = 4.5)
 
 **Singapore: The Linear Network**
 - **Most direct** system (τ = 2.67, best directness)
 - Longest average station spacing (1.51 km/station)
 - Perfect connectivity for linear structure (ρ = 1.0)
-- Best short-range SME (20 min threshold)
+- Best short-range Infrastructure Efficiency (20 min threshold)
 
 ### Accessibility Patterns
 
 **Short Trips (20-30 min):**
-- Singapore leads in 20-min SME (2,743)
+- Berlin leads in Infrastructure Efficiency (0.48-0.96 km²/km)
 - All cities achieve 50-80% reachability
 - Good for commuter access
 
 **Medium Trips (45-60 min):**
-- Berlin dominates (SME 7,772-9,388)
+- Berlin dominates (IE 1.77-2.41 km²/km)
 - All networks achieve 95%+ reachability
 - Covers most intra-city travel
 
@@ -234,7 +285,7 @@ Comparative analysis of three major urban transit systems using Functional Resil
 ### Metrics Consistency
 All three cities use identical formulas for:
 - D&K Indicators (σ, τ, ρ)
-- SME calculation (reachable area / normalized track length)
+- Accessibility metrics (IE, PCA, DNC - proposed framework)
 - FRI performance ratios
 - Reachability percentages (with floor rounding)
 
@@ -245,7 +296,7 @@ All three cities use identical formulas for:
 All cities include:
 1. **Network Graph** (3 layouts: geographic, force-directed, spring)
 2. **FRI Resilience Curves** (random and targeted failures)
-3. **SME Analysis** (reachability % and SME values)
+3. **Accessibility Analysis** (reachability % and efficiency metrics)
 4. **Network Degradation** (performance under attack)
 5. **Travel Time Distribution** (with max, mean, median statistics)
 

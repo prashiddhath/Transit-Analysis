@@ -29,7 +29,7 @@ DATA_DIR = "input/singapore_2009"
 OUTPUT_DIR = "outputs/singapore_2009"
 
 # Singapore parameters
-SINGAPORE_POPULATION = 5_453_600  # 2024 estimate
+SINGAPORE_2009_POPULATION = 4987573  # 2024 estimate
 SINGAPORE_AREA = 734.3  # km²
 
 # Travel parameters
@@ -46,6 +46,10 @@ RANDOM_FAILURE_PROBS = [0.05, 0.10, 0.15, 0.20]  # Probabilities for random fail
 RANDOM_SCENARIOS_PER_PROB = 10  # Number of random scenarios per probability
 TARGETED_FAILURE_COUNTS = [1, 2, 3, 4, 5, 6, 7, 8]  # Number of stations to remove in targeted failures
 
+# Singapore 2009 MRT lines (only these 4 lines existed in 2009)
+# Excluding LRT lines (BP, PE, PW, SE, SW) and later MRT lines (CG, CE, DT, TE)
+SINGAPORE_2009_LINES = ['NS', 'EW', 'NE', 'CC']
+
 # Create output directory
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -54,33 +58,42 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # ==================================================================================
 
 def load_singapore_data():
-    """Load Singapore MRT/LRT GTFS data"""
+    """Load Singapore GTFS data, filtered to 2009 MRT lines only"""
     print("=" * 80)
     print("LOADING SINGAPORE MRT/LRT DATA")
     print("=" * 80)
     
-    # Standard GTFS filenames
-    routes = pd.read_csv(os.path.join(DATA_DIR, "routes.txt"))
-    trips = pd.read_csv(os.path.join(DATA_DIR, "trips.txt"))
-    stop_times = pd.read_csv(os.path.join(DATA_DIR, "stop_times.txt"))
-    stops = pd.read_csv(os.path.join(DATA_DIR, "stops.txt"))
+    routes = pd.read_csv(os.path.join(DATA_DIR, 'routes.txt'))
+    trips = pd.read_csv(os.path.join(DATA_DIR, 'trips.txt'))
+    stop_times = pd.read_csv(os.path.join(DATA_DIR, 'stop_times.txt'))
+    stops = pd.read_csv(os.path.join(DATA_DIR, 'stops.txt'))
     
-    # Filter for MRT/LRT only (route_type == 1)
-    mrt_routes = routes[routes['route_type'] == 1].copy()
-    mrt_trip_ids = trips[trips['route_id'].isin(mrt_routes['route_id'])]['trip_id']
-    mrt_trips = trips[trips['trip_id'].isin(mrt_trip_ids)].copy()
-    mrt_stop_times = stop_times[stop_times['trip_id'].isin(mrt_trip_ids)].copy()
+    # Filter to subway only (route_type == 1)
+    routes = routes[routes['route_type'] == 1].copy()
     
-    # Get unique stops used by MRT
-    mrt_stop_ids = mrt_stop_times['stop_id'].unique()
-    mrt_stops = stops[stops['stop_id'].isin(mrt_stop_ids)].copy()
+    # CRITICAL: Filter to only the 4 MRT lines that existed in 2009
+    print(f"\nFiltering to Singapore 2009 lines: {SINGAPORE_2009_LINES}")
+    print(f"Total subway routes in GTFS: {len(routes)}")
+    routes = routes[routes['route_id'].isin(SINGAPORE_2009_LINES)].copy()
+    print(f"Routes after 2009 filter: {len(routes)}")
+    print(f"Lines: {sorted(routes['route_id'].tolist())}")
     
-    print(f"\nTotal routes: {len(routes)} (filtered to {len(mrt_routes)} MRT/LRT lines)")
-    print(f"MRT/LRT trips: {len(mrt_trips)}")
-    print(f"MRT/LRT stop times: {len(mrt_stop_times)}")
-    print(f"MRT/LRT stops: {len(mrt_stops)}")
+    # Filter trips to only those routes
+    trips = trips[trips['route_id'].isin(routes['route_id'])].copy()
     
-    return mrt_routes, mrt_trips, mrt_stop_times, mrt_stops
+    # Filter stop_times to only those trips
+    stop_times = stop_times[stop_times['trip_id'].isin(trips['trip_id'])].copy()
+    
+    # Get unique stops used by 2009 MRT lines
+    mrt_stop_ids = stop_times['stop_id'].unique()
+    stops = stops[stops['stop_id'].isin(mrt_stop_ids)].copy()
+    
+    print(f"\nTotal routes: {len(routes)} (Singapore 2009 MRT lines only)")
+    print(f"MRT trips: {len(trips)}")
+    print(f"MRT stop times: {len(stop_times)}")
+    print(f"MRT stops: {len(stops)}")
+    
+    return routes, trips, stop_times, stops
 
 
 def parse_time(time_str):
@@ -823,17 +836,21 @@ def compute_fri(G_baseline, G_full, topology, stations_df, total_length, num_lin
     scenarios = []
     failed_stations_log = []  # Track which stations were removed in each scenario
     
+    # FRI uses D&K graph (transfer/terminal stations only), not full network
     all_stations = list(G_baseline.nodes())
     total_stations_full = len(stations_df)  # Total stations for percentage calculation
     
     # 1. Random failures
     print("\n1. Random Station Failures")
     for prob in RANDOM_FAILURE_PROBS:
+        num_fail = max(1, round(len(all_stations) * prob))  # Round and ensure at least 1 station
+        if num_fail >= len(all_stations):
+            print(f"  Skipping prob={prob:.2f}: would remove {num_fail} out of {len(all_stations)} stations (too many)")
+            continue
+        
+        print(f"  Testing {prob*100:.0f}% failure rate ({num_fail} stations) with {RANDOM_SCENARIOS_PER_PROB} runs")
         for run in range(RANDOM_SCENARIOS_PER_PROB):
             # Randomly select stations to fail
-            num_fail = int(len(all_stations) * prob)
-            if num_fail == 0:
-                continue
             
             failed = set(np.random.choice(all_stations, size=num_fail, replace=False))
             
@@ -1201,17 +1218,31 @@ def compute_sme(G_full, stations_df, total_length):
             # Fallback: use average reachable stations as proxy
             reachable_area = avg_reachable_per_station * 2  # Assume 2 km² per station
         
-        # SME (System-level Mobility Efficiency) - Area-based formula
-        # SME_A = A_T / (L · Pop)
-        # Where: A_T = reachable area (km²), L = track length (km), Pop = population (in millions)
-        pop_millions = SINGAPORE_POPULATION / 1_000_000
-        sme = reachable_area / (total_length * pop_millions)  # Normalize
+        # Calculate multiple SME metrics
+        pop_millions = SINGAPORE_2009_POPULATION / 1_000_000
+        
+        # 1. Infrastructure Efficiency (IE): A_T / L
+        infrastructure_efficiency = reachable_area / total_length if total_length > 0 else 0
+        
+        # 2. Per-Capita Accessibility (PCA): A_T / P
+        per_capita_accessibility = reachable_area / pop_millions if pop_millions > 0 else 0
+        
+        # 3. Density-Normalized Coverage (DNC): (A_T / A_city) / (L / P)
+        coverage_fraction = reachable_area / SINGAPORE_AREA if SINGAPORE_AREA > 0 else 0
+        track_per_capita = total_length / pop_millions if pop_millions > 0 else 0
+        density_normalized_coverage = coverage_fraction / track_per_capita if track_per_capita > 0 else 0
+        
+        # 4. Legacy SME (for backward compatibility): A_T / (L × P)
+        sme_legacy = reachable_area / (total_length * pop_millions) if (total_length * pop_millions) > 0 else 0
         
         print(f"  Average reachable stations: {avg_reachable_per_station:.1f} / {len(stations_df)} ({reachability_pct:.1f}%)")
         print(f"  Median reachable: {median_reachable}")
         print(f"  Max travel time in network: {max_travel_time:.1f} min")
         print(f"  Estimated reachable area: {reachable_area:.2f} km²")
-        print(f"  SME: {sme:.2f}")
+        print(f"  Infrastructure Efficiency (IE): {infrastructure_efficiency:.2f} km²/track-km")
+        print(f"  Per-Capita Accessibility (PCA): {per_capita_accessibility:.2f} km²/M people")
+        print(f"  Density-Normalized Coverage (DNC): {density_normalized_coverage:.4f}")
+        print(f"  Legacy SME: {sme_legacy:.2f}")
         
         sme_results.append({
             'time_threshold': time_threshold,
@@ -1220,7 +1251,10 @@ def compute_sme(G_full, stations_df, total_length):
             'reachability_pct': reachability_pct,
             'max_travel_time': max_travel_time,
             'reachable_area_km2': reachable_area,
-            'sme': sme
+            'infrastructure_efficiency': infrastructure_efficiency,
+            'per_capita_accessibility': per_capita_accessibility,
+            'density_normalized_coverage': density_normalized_coverage,
+            'sme_legacy': sme_legacy
         })
     
     return pd.DataFrame(sme_results)
@@ -1324,10 +1358,16 @@ def visualize_network_graph(G, stations_df, topology, output_path):
                             edgecolor='gray', alpha=0.9, linewidth=0.5),
                    zorder=1000)
         
-        # Title
-        ax.set_title(f'Berlin U-Bahn Network — {layout_titles[layout_name]}\n' + 
-                    f'{G.number_of_nodes()} Vertices · {G.number_of_edges()} Edges · ' +
-                    f'27 Transfer · 14 Terminal Stations',
+        # Title - get actual counts from topology
+        num_transfer = len(topology['transfer_stations'])
+        num_terminal_total = len(topology['terminal_stations'])
+        # Calculate terminal-only (D&K v_e) to avoid confusion with overlap
+        num_terminal_only = num_terminal_total - len(topology['transfer_stations'] & topology['terminal_stations'])
+        total_vertices = num_transfer + num_terminal_only
+        
+        ax.set_title(f'Singapore MRT Network (2009) — {layout_titles[layout_name]}\n' + 
+                    f'{total_vertices} D&K Vertices · {G.number_of_edges()} Edges · ' +
+                    f'{num_transfer} Transfer · {num_terminal_only} Terminal-Only',
                     fontsize=20, fontweight='bold', pad=30, color='#1A1A1D')
         
         # For geographic layout, set tight bounds to remove extra whitespace
@@ -1403,11 +1443,19 @@ def visualize_fri_resilience(scenarios_df, output_path, metric_type='transfers')
         ax1.set_xlabel('Failure Probability (%)', fontsize=12, fontweight='bold')
         ax1.set_ylabel('Performance Ratio', fontsize=12, fontweight='bold')
         ax1.set_title('Random Station Failures', fontsize=14, fontweight='bold')
+        ax1.set_xlim([4, 21])  # Fixed x-axis: 5-20% failure probability
+        ax1.set_xticks([5, 10, 15, 20])
         ax1.grid(True, alpha=0.3)
         ax1.legend(fontsize=10)
-        ax1.set_ylim([0.8, 1.05])
+        
+        # Auto-scale y-axis with some padding
+        y_min = (grouped['mean'] - grouped['std']).min()
+        y_max = max((grouped['mean'] + grouped['std']).max(), 1.0)
+        y_padding = (y_max - y_min) * 0.1
+        ax1.set_ylim([max(0, y_min - y_padding), y_max + y_padding])
     
     # Plot 2: Targeted failures
+    all_values = []
     for scenario_type in ['degree', 'betweenness']:
         targeted_data = scenarios_df[scenarios_df['type'] == scenario_type].copy()
         if len(targeted_data) > 0 and perf_col in targeted_data.columns:
@@ -1415,15 +1463,25 @@ def visualize_fri_resilience(scenarios_df, output_path, metric_type='transfers')
             color = '#4ECDC4' if scenario_type == 'degree' else '#FFD93D'
             ax2.plot(grouped.index, grouped.values, marker='o', linewidth=2, 
                     markersize=8, label=scenario_type.capitalize(), color=color)
-            ax2.fill_between(grouped.index, 0.8, grouped.values, alpha=0.1, color=color)
+            all_values.extend(grouped.values)
     
-    ax2.axhline(y=1.0, color='gray', linestyle='--', alpha=0.5, label='Baseline')
-    ax2.set_xlabel('Number of Stations Removed', fontsize=12, fontweight='bold')
-    ax2.set_ylabel('Performance Ratio', fontsize=12, fontweight='bold')
-    ax2.set_title('Targeted Station Failures', fontsize=14, fontweight='bold')
-    ax2.grid(True, alpha=0.3)
-    ax2.legend(fontsize=10)
-    ax2.set_ylim([0.8, 1.05])
+    if all_values:
+        # Filter out NaN and Inf values before calculating limits
+        valid_values = [v for v in all_values if np.isfinite(v)]
+        
+        if valid_values:
+            ax2.axhline(y=1.0, color='gray', linestyle='--', alpha=0.5, label='Baseline')
+            ax2.set_xlabel('Number of Stations Removed', fontsize=12, fontweight='bold')
+            ax2.set_ylabel('Performance Ratio', fontsize=12, fontweight='bold')
+            ax2.set_title('Targeted Station Failures', fontsize=14, fontweight='bold')
+            ax2.grid(True, alpha=0.3)
+            ax2.legend(fontsize=10)
+            
+            # Auto-scale y-axis with some padding
+            y_min = min(valid_values)
+            y_max = max(max(valid_values), 1.0)
+            y_padding = (y_max - y_min) * 0.1 if y_max > y_min else 0.1
+            ax2.set_ylim([max(0, y_min - y_padding), y_max + y_padding])
     
     plt.suptitle(f'Functional Resilience Index (FRI) - Using δ_{metric_type}',
                 fontsize=16, fontweight='bold', y=1.02)
@@ -1464,26 +1522,28 @@ def visualize_sme_analysis(sme_df, output_path):
     ax1.set_ylim([0, 105])
     ax1.set_xticks(time_thresholds)
     
-    # Plot 2: SME values
-    sme_values = sme_df['sme'].values
+    # Plot 2: Infrastructure Efficiency values
+    ie_values = sme_df["infrastructure_efficiency"].values
     colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(time_thresholds)))
-    bars = ax2.bar(range(len(time_thresholds)), sme_values, color=colors, alpha=0.8, edgecolor='black', linewidth=1.5)
+    bars = ax2.bar(range(len(time_thresholds)), ie_values, color=colors, alpha=0.8, edgecolor="black", linewidth=1.5)
     
-    # Add value labels
-    for i, (bar, val) in enumerate(zip(bars, sme_values)):
+    # Add value labels with consistent offset
+    for i, (bar, val) in enumerate(zip(bars, ie_values)):
         height = bar.get_height()
-        ax2.text(bar.get_x() + bar.get_width()/2., height + 100,
-                f'{val:.0f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+        offset = max(ie_values) * 0.03
+        ax2.text(bar.get_x() + bar.get_width()/2., height + offset,
+                f"{val:.2f}", ha="center", va="bottom", fontsize=10, fontweight="bold")
     
-    ax2.set_xlabel('Time Threshold (minutes)', fontsize=12, fontweight='bold')
-    ax2.set_ylabel('SME Value', fontsize=12, fontweight='bold')
-    ax2.set_title('System Level Mobility Efficiency (SME)', fontsize=14, fontweight='bold')
+    ax2.set_xlabel("Time Threshold (minutes)", fontsize=12, fontweight="bold")
+    ax2.set_ylabel("Infrastructure Efficiency (km²/track-km)", fontsize=12, fontweight="bold")
+    ax2.set_title("Infrastructure Efficiency (IE)", fontsize=14, fontweight="bold")
     ax2.set_xticks(range(len(time_thresholds)))
-    ax2.set_xticklabels([f'{t} min' for t in time_thresholds])
-    ax2.grid(True, alpha=0.3, axis='y')
+    ax2.set_xticklabels([f"{t} min" for t in time_thresholds])
+    ax2.grid(True, alpha=0.3, axis="y")
+    ax2.set_ylim([0, max(ie_values) * 1.15])
     
-    plt.suptitle('SME Analysis - Network Accessibility and Mobility Efficiency',
-                fontsize=16, fontweight='bold', y=1.02)
+    plt.suptitle("SME Analysis - Network Accessibility and Infrastructure Efficiency",
+                fontsize=16, fontweight="bold", y=1.02)
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
@@ -1502,14 +1562,19 @@ def visualize_network_degradation(scenarios_df, output_path):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
     
     # Plot 1: Isolated Stations
+    all_isolated_values = []
     for scenario_type in ['degree', 'betweenness']:
         targeted_data = scenarios_df[scenarios_df['type'] == scenario_type].copy()
         if len(targeted_data) > 0 and 'isolated_stations' in targeted_data.columns:
             grouped = targeted_data.groupby('failed_count')['isolated_stations'].mean()
-            color = '#E63946' if scenario_type == 'degree' else '#FFB703'
-            ax1.plot(grouped.index, grouped.values, marker='o', linewidth=2.5, 
-                    markersize=8, label=scenario_type.capitalize(), color=color)
-            ax1.fill_between(grouped.index, 0, grouped.values, alpha=0.2, color=color)
+            
+            # Validate data is not empty or NaN
+            if len(grouped) > 0 and not grouped.isna().all():
+                color = '#E63946' if scenario_type == 'degree' else '#FFB703'
+                ax1.plot(grouped.index, grouped.values, marker='o', linewidth=2.5, 
+                        markersize=8, label=scenario_type.capitalize(), color=color)
+                ax1.fill_between(grouped.index, 0, grouped.values, alpha=0.2, color=color)
+                all_isolated_values.extend(grouped.values)
     
     ax1.set_xlabel('Number of Stations Removed', fontsize=12, fontweight='bold')
     ax1.set_ylabel('Isolated Stations (Count)', fontsize=12, fontweight='bold')
@@ -1517,9 +1582,22 @@ def visualize_network_degradation(scenarios_df, output_path):
                  fontsize=14, fontweight='bold')
     ax1.grid(True, alpha=0.3)
     ax1.legend(fontsize=10)
-    ax1.set_ylim(bottom=0)
+    
+    # Calculate y-axis limits for ax1 with NaN check
+    if all_isolated_values:
+        valid_values_ax1 = np.array(all_isolated_values)[~np.isnan(all_isolated_values)]
+        if len(valid_values_ax1) > 0:
+            y_min_ax1 = np.min(valid_values_ax1)
+            y_max_ax1 = np.max(valid_values_ax1)
+            y_padding_ax1 = (y_max_ax1 - y_min_ax1) * 0.1 if y_max_ax1 > y_min_ax1 else 0.1
+            ax1.set_ylim([max(0, y_min_ax1 - y_padding_ax1), y_max_ax1 + y_padding_ax1])
+        else:
+            ax1.set_ylim(bottom=0) # Fallback if all values are NaN
+    else:
+        ax1.set_ylim(bottom=0) # Fallback if no data
     
     # Plot 2: Network Connectivity (% Reachable Pairs)
+    all_reachable_values = []
     for scenario_type in ['degree', 'betweenness']:
         targeted_data = scenarios_df[scenarios_df['type'] == scenario_type].copy()
         if len(targeted_data) > 0 and 'reachable_pct' in targeted_data.columns:
@@ -1619,9 +1697,9 @@ def main():
     for scenario_type, fri_value in fri_by_type.items():
         print(f"  FRI ({scenario_type}): {fri_value:.4f}")
     
-    print(f"\nSME (System Level Mobility Efficiency):")
+    print(f"\nInfrastructure Efficiency (IE):")
     for _, row in sme_df.iterrows():
-        print(f"  SME @ {row['time_threshold']} min: {row['sme']:.2f}")
+        print(f"  IE @ {row['time_threshold']} min: {row['infrastructure_efficiency']:.2f} km²/track-km")
     
     # === VISUALIZATIONS ===
     print("\n" + "=" * 80)

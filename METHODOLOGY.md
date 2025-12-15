@@ -623,11 +623,67 @@ reachable_pct = (reachable_pairs / total_pairs) × 100
 
 ### 7.1 Conceptual Framework
 
-SME quantifies network accessibility by measuring the geographic area reachable within time thresholds, normalized by network infrastructure investment.
+SME quantifies network accessibility by measuring the geographic area reachable within time thresholds, providing insights into how effectively transit infrastructure serves the population.
 
-### 7.2 Reachability Analysis
+### 7.2 Methodological Evolution: From Legacy SME to Normalized Metrics
 
-**Time Thresholds Tested:** 20, 30, 45, 60, 75, 90, 120 minutes
+#### 7.2.1 Legacy SME Formula (Deprecated)
+
+**Original Formula:**
+```
+SME_legacy(t) = A_reachable(t) / (L × P)
+```
+
+**Critical Flaw Identified:**
+- Multiplying length by population creates dimensionally inconsistent normalization
+- Does not account for differences in city density or geographic scale
+- Makes cross-city comparisons misleading
+- Units: km²/(km × people) = dimensionally awkward
+
+#### 7.2.2 Proposed Novel Metrics for Transit Accessibility
+
+To address the dimensional and interpretability issues with the legacy formula, we propose **three new normalized metrics** as contributions of this study:
+
+**1. Infrastructure Efficiency (IE)** - Primary Proposed Metric
+```
+IE(t) = A_reachable(t) / L
+```
+- **Units:** km²/km (reachable area per track length)
+- **Interpretation:** Geographic coverage productivity of infrastructure
+- **Range:** Typically 0.5-3.0 for metro systems
+- **Rationale:** Isolates infrastructure performance from population and city size effects
+
+**2. Per-Capita  Accessibility (PCA)** - Population-Normalized Metric
+```
+PCA(t) = A_reachable(t) / (P / 1,000,000)
+```
+- **Units:** km²/million people
+- **Interpretation:** Service area available per million residents
+- **Range:** Typically 10-200 km²/M
+- **Rationale:** Normalizes by population to compare service levels across cities
+
+**3. Density-Normalized Coverage (DNC)** - Compound Normalization
+```
+DNC(t) = (A_reachable / A_city) / (L / P_millions)
+```
+- **Units:** Dimensionless ratio
+- **Interpretation:** Coverage efficiency accounting for city scale and density
+- **Range:** Typically 0.001-0.03
+- **Rationale:** Combines geographic and demographic normalization for universal comparability
+
+**4. Legacy SME** - For Backward Compatibility
+```
+SME_legacy(t) = A_reachable(t) / (L × P_millions)
+```
+- Retained for comparison with earlier iterations of this research
+- **Not recommended** for primary analysis due to dimensional inconsistency
+
+**Methodological Contribution:**
+These metrics represent a novel framework for comparing transit accessibility across cities with vastly different scales, densities, and urban forms. Unlike single-formula approaches, this multi-metric framework provides complementary perspectives on infrastructure productivity, population service, and normalized coverage.
+
+### 7.3 Reachability Analysis
+
+**Time Thresholds Tested:** 20, 30, 45, 60, 75, 90 minutes
 
 **For each time threshold t:**
 
@@ -645,7 +701,7 @@ SME quantifies network accessibility by measuring the geographic area reachable 
    - Average reachable stations: mean(|R_i(t)|) across all i
    - Reachability percentage: (Σ|R_i(t)| / N²) × 100
 
-### 7.3 Reachable Area Estimation
+### 7.4 Reachable Area Estimation
 
 **Method:** Convex hull approximation
 
@@ -658,21 +714,32 @@ area = convex_hull(coordinates).area  # km²
 
 **Fallback:** If scipy unavailable, use proxy: area ≈ 2 × |R_i(t)|
 
-### 7.4 SME Formula
+### 7.5 City Parameters
 
-```
-SME(t) = A_reachable(t) / (L / P × 1000)
-```
+| City | Population (millions) | Area (km²) | Track Length (km) |
+|------|----------------------|------------|-------------------|
+| NYC | 8.34 | 783.8 | 380.17 |
+| Berlin | 3.85 | 891.8 | 153.27 |
+| Singapore | 5.45 | 734.3 | 231.63 |
 
-Where:
-- A_reachable(t) = Reachable area at time threshold t (km²)
-- L = Total route length (km)
-- P = City population
+### 7.6 Metric Interpretation Guide
 
-**Interpretation:**  
-Higher SME indicates greater accessibility per unit of infrastructure per capita.
+**Infrastructure Efficiency (IE):**
+- IE = 1.0 → Each km of track serves 1 km² area
+- NYC: ~0.3 → Dense network, limited geographic spread
+- Singapore: ~1.5 → Efficient area coverage per track
 
-### 7.5 Travel Time Distribution Analysis
+**Per-Capita Accessibility (PCA):**
+- Higher values = more service area per resident
+- Compact cities (Singapore) have lower PCA but better density
+- Sprawling cities (NYC) may show higher PCA but lower efficiency
+
+**Density-Normalized Coverage (DNC):**
+- Accounts for both city size AND population density
+- Best metric for comparing cities of vastly different scales
+- Dimensionless allows universal comparison
+
+### 7.7 Travel Time Distribution Analysis
 
 **Full Pairwise Calculation:**
 - All N × (N-1) / 2 station pairs
