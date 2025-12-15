@@ -88,11 +88,12 @@ Comparative analysis of three major urban transit systems using Functional Resil
 | **Berlin** | 73.0 min | 21.6 min | 20.0 min | - |
 | **Singapore** | 93.0 min | 25.6 min | 23.0 min | Pasir Ris → Tuas Link |
 
+
 ---
 
-## Transit Accessibility Metrics (Proposed Framework)
+## Transit Accessibility Metrics
 
-### Infrastructure Efficiency (IE) - Primary Metric
+### Infrastructure Efficiency (IE)
 *Geographic coverage per unit of infrastructure*
 
 **What it measures:** How much geographic area the network makes accessible per kilometer of track. Higher values indicate more efficient use of infrastructure investment.
@@ -101,14 +102,14 @@ Comparative analysis of three major urban transit systems using Functional Resil
 
 | Time | NYC | Berlin | Singapore | Leader |
 |------|-----|--------|-----------|--------|
-| **20 min** | 0.12 | 0.48 | 0.39 | Berlin |
-| **30 min** | 0.20 | 0.96 | 0.79 | Berlin |
-| **45 min** | 0.37 | 1.77 | 1.29 | Berlin |
-| **60 min** | 0.61 | 2.41 | 1.71 | Berlin |
-| **75 min** | 0.78 | 2.51 | 1.76 | Berlin |
-| **90 min** | 0.85 | 2.51 | 1.84 | Berlin |
+| **20 min** | 0.13 | 0.48 | 0.39 | Berlin |
+| **30 min** | 0.16 | 0.96 | 0.79 | Berlin |
+| **45 min** | 0.22 | 1.77 | 1.29 | Berlin |
+| **60 min** | 0.28 | 2.41 | 1.71 | Berlin |
+| **75 min** | 0.28 | 2.51 | 1.76 | Berlin |
+| **90 min** | 0.28 | 2.51 | 1.84 | Berlin |
 
-**Formula:** 
+**Formula:**
 ```
 IE(t) = A_reachable(t) / L
 ```
@@ -117,10 +118,18 @@ Where:
 - L = Total route length (km)
 - Units: km²/km
 
-**Interpretation:**
-- Berlin achieves 2-3x the area coverage per km of track
-- NYC's extensive network (1,631 km) serves limited geographic spread
-- Singapore balanced at ~1.5-1.8 km²/km
+**Results Analysis:**
+- **Berlin leads** at all time thresholds (0.48-2.51 km²/km)
+  - Compact 153 km network concentrated in dense urban core
+  - Each km of track serves 2-3× more area than other cities
+  - Dense station spacing (0.90 km/station) enables efficient coverage
+- **Singapore moderate** (0.39-1.84 km²/km)
+  - Linear network design balances efficiency with island geography
+  - Strategic corridor placement optimizes coverage
+- **NYC lowest** (0.13-0.28 km²/km)
+  - Sprawling 1,631 km network across 5 boroughs
+  - Long radial lines serve low-density outer areas
+  - Design prioritizes regional reach over infrastructure efficiency
 
 ### Per-Capita Accessibility (PCA)
 *Service area per million residents*
@@ -147,10 +156,18 @@ Where:
 - P = City population (people)
 - Units: km² per million people
 
-**Interpretation:**
-- Berlin provides 2-3x more accessible area per capita
-- Reflects population density and network efficiency
-- NYC serves 8.3M people with lower per-capita accessibility
+**Results Analysis:**
+- **Berlin dominates** (19.1-99.8 km²/M)
+  - Smaller population (3.85M) means more area per capita
+  - Each resident has access to 2-3× more area than other cities
+  - Low population density spreads service benefits
+- **Singapore moderate** (13.1-62.0 km²/M)
+  - Mid-sized population (5.45M) balanced with network extent
+  - Efficient planned system scales appropriately
+- **NYC lowest** (5.4-38.3 km²/M)
+  - Large population (8.34M) dilutes per-capita accessibility
+  - Despite extensive network, more people share same area
+  - High-density boroughs concentrate population
 
 ### Density-Normalized Coverage (DNC)
 *Dimensionless metric accounting for city scale and population*
@@ -182,118 +199,112 @@ Where:
 - P_millions = City population in millions
 - Units: Dimensionless ratio
 
-**Interpretation:**
-- Accounts for both city size AND population density
-- Berlin's compact urban form yields highest normalized coverage
-- Enables fair comparison across vastly different city scales
+**Results Analysis:**
+- **Berlin most efficient** (0.0086-0.0463)
+  - High productivity even after normalization
+  - 153 km serves 3.85M people across 892 km² efficiently
+  - Compact urban form enables genuine infrastructure efficiency
+- **Singapore close second** (0.0085-0.0402)
+  - Well-matched network-to-city-size ratio
+  - Modern planning optimizes normalized performance
+- **NYC lowest** (0.0041-0.0306)
+  - Despite massive network, lower normalized efficiency
+  - Sprawling form (629 km² served by 1,631 km) reduces productivity
+  - High infrastructure per capita but lower area coverage fraction
 
-### Reachability Percentage
-
-| Time Threshold | NYC | Berlin | Singapore |
-|----------------|-----|--------|--------------|
-| **20 min** | 50.0% | 51.0% | 43.6% |
-| **30 min** | 77.5% | 79.0% | 67.4% |
-| **45 min** | 96.3% | 95.9% | 90.5% |
-| **60 min** | 99.6% | 99.6% | 97.6% |
-| **75 min** | 99.9% | 100.0% | 99.6% |
-| **90 min** | 100.0% | 100.0% | 99.9% |
-
-**Note:** Percentages are floored to 1 decimal place to avoid misleading rounding (99.99% displays as 99.9%, not 100.0%)
-
-**Methodological Contribution:**
-These three metrics (IE, PCA, DNC) represent a novel framework proposed in this study to address limitations of traditional single-formula accessibility measures. They provide complementary perspectives:
-- **IE:** Infrastructure productivity (geographic)
-- **PCA:** Population equity (demographic)
-- **DNC:** Universal comparison (normalized)
-
-### Metric Analysis: Why the Rankings?
-
-#### Infrastructure Efficiency (IE) - Why NYC is Lowest
-
-**NYC's Lower IE (0.28-0.85 km²/km):**
-- **Sprawling network**: 1,631.7 km of track across 5 boroughs
-- **Long radial lines**: Extensive routes to outer areas (Queens, Bronx, Brooklyn)
-- **Low-density coverage**: Much track runs through suburban-density areas
-- **Design for regional reach**: Optimized for coverage extent, not efficiency per km
-- **Result**: More track needed per unit of area covered
-
-**Berlin's Higher IE (0.48-2.51 km²/km):**
-- **Compact network**: 153.3 km concentrated in dense urban core
-- **Short, interconnected lines**: Dense station spacing (0.90 km/station)
-- **Concentrated urban form**: Network serves high-density central city
-- **Design for density**: Optimized for efficient area coverage
-- **Result**: Each km of track serves larger geographic area
-
-**Singapore's Balanced IE (0.39-1.84 km²/km):**
-- **Strategic corridors**: 184.7 km along major transit axes
-- **Planned efficiency**: Purpose-built network with optimal spacing
-- **Linear island geography**: Network follows natural corridor patterns
-- **Result**: Moderate efficiency between NYC sprawl and Berlin density
-
-**Key Insight:** IE reveals **design philosophy** - NYC prioritizes regional accessibility over infrastructure efficiency, while Berlin optimizes efficiency within a compact footprint.
-
-#### Per-Capita Accessibility (PCA) - Population-Normalized Service
-
-**NYC's Lower PCA (5.4-38.3 km²/M):**
-- **Large population**: 8.34 million people
-- **Dilution effect**: Same reachable area divided among more residents
-- **High-density boroughs**: Many people concentrated in limited area
-- **Trade-off**: Extensive network but lower per-capita service area
-
-**Berlin's Higher PCA (19.1-99.8 km²/M):**
-- **Smaller population**: 3.85 million people
-- **Concentration benefit**: Moderate area serves fewer people
-- **Result**: Each million residents has access to much larger area
-
-**Singapore's Moderate PCA (13.1-62.0 km²/M):**
-- **Mid-sized population**: 5.45 million people
-- **Balanced approach**: Network scaled appropriately for population
-
-**Key Insight:** PCA shows **population equity** - Berlin residents have 2-3× more accessible area per capita, reflecting different density and urban form.
-
-#### Density-Normalized Coverage (DNC) - Universal Comparison
-
-**Why DNC Enables Fair Comparison:**
-
-DNC accounts for BOTH city size AND population by normalizing:
-1. Coverage fraction: `A_reachable / A_city` (what % of city is accessible)
-2. Per-capita infrastructure: `L / P_millions` (km of track per million people)
-
-**NYC's Lower DNC (0.0041-0.0306):**
-- Despite massive network (1,631.7 km), covers only small fraction of large area (629.2 km²)
-- High infrastructure per capita (195.7 km/M people) but serves sprawling region
-- **Meaning**: Low efficiency even after normalizing for population and scale
-
-**Berlin's Higher DNC (0.0086-0.0463):**
-- Compact network (153.3 km) covers significant fraction of city (892 km²)
-- Low infrastructure per capita (39.8 km/M people) but highly productive
-- **Meaning**: Each km of infrastructure highly effective at covering city
-
-**Singapore's Balanced DNC (0.0085-0.0402):**
-- Network (184.7 km) well-matched to city size (734.3 km²)
-- Moderate infrastructure per capita (33.9 km/M people)
-- **Meaning**: Efficient planned system balancing coverage and investment
-
-**Key Insight:** DNC reveals **true efficiency** after accounting for all confounding factors - NYC's apparent large network is actually less efficient when city scale and population are properly normalized.
-
-### Design Philosophy Implications
-
-**NYC: Regional Connectivity Strategy**
-- Accepts lower efficiency to achieve borough-wide coverage
-- Prioritizes reaching outer areas over infrastructure productivity
-- Appropriate for sprawling American metropolitan form
-
-**Berlin: Compact Efficiency Strategy**
-- Maximizes efficiency within dense urban core
-- Every km of track highly productive
-- Appropriate for compact European city form
-
-**Singapore: Planned Optimization**
-- Balanced approach to efficiency and coverage
-- Modern network optimized for island geography
-- Demonstrates benefits of integrated planning
+**Key Insight:** DNC confirms efficiency rankings are **structural** (urban form) not artifacts of city size. Berlin's compact form genuinely enables better infrastructure productivity than NYC's sprawl.
 
 ---
+
+## Functional Resilience Index (FRI) Analysis
+
+### Understanding Network Resilience
+
+FRI quantifies how well transit networks maintain performance when stations fail. Higher FRI values (closer to 1.0) indicate better resilience. We analyze two failure modes:
+- **Random Failures**: Equipment breakdowns, accidents (unintentional disruptions)
+- **Targeted Attacks**: Strategic removal of critical stations (intentional disruptions)
+
+### City-by-City Resilience Analysis
+
+#### Singapore MRT: Most Resilient Network (Overall FRI = 0.87)
+
+**Strengths:**
+- **Best random failure resistance (FRI = 0.88)**: Linear network structure with strategic redundancy
+- **Strong betweenness resilience (FRI = 0.85)**: Purpose-built interchanges distribute routing alternatives
+- **Planned robustness**: Modern design incorporates resilience from inception
+
+**Why Singapore Leads:**
+- **Optimal transfer station placement**: 23 transfer stations strategically positioned
+- **Linear with loops**: East-West + North-South corridors plus Circle Line provide alternatives
+- **Minimal critical single points**: Even removing high-betweenness stations leaves functional network
+- **Modern infrastructure**: Newer system designed with redundancy principles
+
+**Vulnerability:**
+- **Degree-based attacks (FRI = 0.83)**: Large transfer hubs (Jurong East, Dhoby Ghaut) are critical
+- **Island geography**: Limited alternative routes compared to grid-based systems
+
+**Interpretation:** Singapore's resilience reflects **modern planning excellence** - deliberate design for fault tolerance rather than organic growth.
+
+#### Berlin U-Bahn: Balanced Resilience (Overall FRI = 0.80)
+
+**Strengths:**
+- **Consistent performance**: Similar resilience across all attack types (~0.78-0.83)
+- **No extreme vulnerabilities**: Balanced network without catastrophic weak points
+- **Dense station network**: 0.90 km spacing provides local redundancy
+
+**Characteristics:**
+- **Moderate random failures (FRI = 0.80)**: Compact grid structure handles equipment failures well
+- **Moderate targeted attacks**: Neither exceptionally vulnerable nor resilient to strategic disruption
+- **Post-reunification integration**: Merged East/West networks provide some redundancy
+
+**Vulnerabilities:**
+- **Lower connectivity (ρ = 0.85)**: Fewer shared-track segments limit routing alternatives  
+- **Hub dependency**: Some stations (Alexanderplatz, Friedrichstraße) are disproportionately critical
+- **Grid limitations**: Rectangular network less flexible than radial-with-loops design
+
+**Interpretation:** Berlin shows **pragmatic resilience** - adequate but not exceptional, reflecting incremental historical development rather than optimized planning.
+
+#### NYC Subway: Complex Resilience Profile (Overall FRI = 0.73)
+
+**Strengths:**
+- **Best degree-attack resistance (FRI = 0.81)**: High redundancy from merged three-system legacy
+- **Many alternative routes**: 1.22 connectivity means multiple paths between destinations
+- **221 transfer stations**: Extensive transfer network provides rerouting options
+
+**Vulnerabilities:**
+- **Worst random failure performance (FRI = 0.70)**: Large, aging network susceptible to cascading disruptions
+- **Complexity penalty**: 238 special vertices create more failure opportunities
+- **Infrastructure age**: Equipment failures more likely in century-old system
+- **Geographic sprawl**: Long radial lines vulnerable to single-point failures
+
+**Why NYC Struggles with Random Failures:**
+1. **System complexity**: More stations = more potential failure points
+2. **Aged infrastructure**: Higher baseline failure probability
+3. **Long dependencies**: Outer borough lines depend on Manhattan trunk segments
+4. **Limited express bypass**: Local station failures impact entire lines
+
+**Why NYC Excels Against Degree Attacks:**
+1. **Redundant routing**: IRT/BMT/IND overlap provides alternatives
+2. **Many transfer stations**: Removing one hub still leaves many transfer options
+3. **Grid + radial hybrid**: Multiple connection patterns survive hub loss
+
+**Interpretation:** NYC demonstrates **resilient through redundancy, vulnerable through scale** - the massive network's complexity is both strength (alternatives) and weakness (more failure modes).
+
+### Comparative Resilience Insights
+
+| Failure Mode | Best Performing | Why |
+|--------------|----------------|------|
+| **Random Failures** | Singapore (0.88) | Modern design, optimal spacing, strategic interchange placement |
+| **Degree Attacks** | NYC (0.90) | High redundancy from three-system merger, many transfer options |
+| **Betweenness Attacks** | Singapore (0.87) | Linear-with-loops design minimizes critical routing bottlenecks |
+| **Overall Resilience** | Singapore (0.87) | Balanced excellence across all failure modes |
+
+**Key Takeaway:** Network resilience depends on **design philosophy**, not just size:
+- Singapore: **Planned resilience** through deliberate redundancy placement
+- NYC: **Accidental resilience** from historical system overlap, undermined by scale/age
+- Berlin: **Moderate resilience** from pragmatic grid design
+---
+
 
 ## Functional Resilience Index (FRI)
 
@@ -332,31 +343,50 @@ DNC accounts for BOTH city size AND population by normalizing:
 **Berlin: The Compact Network**
 - **Densest** station spacing (0.90 km/station)
 - Serves smallest population (3.85M) with moderate station count
-- Best Infrastructure Efficiency at mid-to-long thresholds (45-90 min)
+- Best infrastructure efficiency (IE 0.48-2.51 km²/km)
 - Lower directness penalty (τ = 4.5)
 
 **Singapore: The Linear Network**
 - **Most direct** system (τ = 2.67, best directness)
 - Longest average station spacing (1.51 km/station)
 - Perfect connectivity for linear structure (ρ = 1.0)
-- Best short-range Infrastructure Efficiency (20 min threshold)
+- Balanced efficiency (IE 0.39-1.84 km²/km)
 
 ### Accessibility Patterns
 
 **Short Trips (20-30 min):**
-- Berlin leads in Infrastructure Efficiency (0.48-0.96 km²/km)
+- Berlin leads in efficiency (IE 0.48-0.96 km²/km)
 - All cities achieve 50-80% reachability
 - Good for commuter access
 
 **Medium Trips (45-60 min):**
-- Berlin dominates (IE 1.77-2.41 km²/km)
+- Berlin dominates accessibility (PCA 70-96 km²/M)
 - All networks achieve 95%+ reachability
 - Covers most intra-city travel
 
 **Long Trips (75-120 min):**
-- Berlin maintains lead
+- Berlin maintains highest per-capita access (99.8 km²/M)
 - All networks reach 100% reachability
 - Reflects city size and network extent
+
+### Accessibility Metrics Summary
+
+**Infrastructure Efficiency (IE):**
+- Berlin: 0.48-2.51 km²/km (leader - compact concentration)
+- Singapore: 0.39-1.84 km²/km (moderate - linear efficiency)
+- NYC: 0.13-0.28 km²/km (lowest - sprawling coverage)
+
+**Per-Capita Accessibility (PCA):**
+- Berlin: 19-100 km²/M (leader - low population density)
+- Singapore: 13-62 km²/M (moderate - balanced planning)
+- NYC: 5-38 km²/M (lowest - high population dilution)
+
+**Density-Normalized Coverage (DNC):**
+- Berlin: 0.0086-0.0463 (leader - genuinely efficient)
+- Singapore: 0.0085-0.0402 (close second - optimal planning)
+- NYC: 0.0041-0.0306 (lowest - sprawl penalty)
+
+
 
 ### Network Efficiency
 
@@ -410,7 +440,7 @@ DNC accounts for BOTH city size AND population by normalizing:
 ### Metrics Consistency
 All three cities use identical formulas for:
 - D&K Indicators (σ, τ, ρ)
-- Accessibility metrics (IE, PCA, DNC - proposed framework)
+- Accessibility metrics (IE, PCA, DNC)
 - FRI performance ratios
 - Reachability percentages (with floor rounding)
 
@@ -421,7 +451,7 @@ All three cities use identical formulas for:
 All cities include:
 1. **Network Graph** (3 layouts: geographic, force-directed, spring)
 2. **FRI Resilience Curves** (random and targeted failures)
-3. **Accessibility Analysis** (reachability % and efficiency metrics)
+3. **Accessibility Analysis** (IE, PCA, DNC metrics visualization)
 4. **Network Degradation** (performance under attack)
 5. **Travel Time Distribution** (with max, mean, median statistics)
 

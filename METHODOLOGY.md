@@ -619,224 +619,213 @@ reachable_pct = (reachable_pairs / total_pairs) × 100
 
 ---
 
-## 7. System Level Mobility Efficiency (SME)
+## 7. Transit Accessibility Metrics
 
-### 7.1 Conceptual Framework
+### 7.1 Conceptual Overview
 
-SME quantifies network accessibility by measuring the geographic area reachable within time thresholds, providing insights into how effectively transit infrastructure serves the population.
+Transit accessibility measures **how well transit networks connect people to geographic opportunities** within time constraints. Unlike topological metrics (which measure network structure), accessibility metrics evaluate **functional performance** - what areas riders can actually reach.
 
-### 7.2 Methodological Evolution: From Legacy SME to Normalized Metrics
+**Core Concept:** A transit network's value depends not just on how it's built (connectivity, density) but on **what it enables riders to access** (jobs, services, amenities) within reasonable travel times.
 
-#### 7.2.1 Legacy SME Formula (Deprecated)
+**Why Three Metrics?** Different stakeholders care about different aspects:
+- **Infrastructure planners** → IE (return on infrastructure investment)
+- **Equity advocates** → PCA (fairness of access across population)
+- **Comparative researchers** → DNC (fair cross-city comparison)
 
-**Original Formula:**
-```
-SME_legacy(t) = A_reachable(t) / (L × P)
-```
+### 7.2 Metric Definitions and Rationale
 
-**Critical Flaw Identified:**
-- Multiplying length by population creates dimensionally inconsistent normalization
-- Does not account for differences in city density or geographic scale
-- Makes cross-city comparisons misleading
-- Units: km²/(km × people) = dimensionally awkward
+#### 7.2.1 Infrastructure Efficiency (IE)
 
-#### 7.2.2 Proposed Novel Metrics for Transit Accessibility
-
-To address the dimensional and interpretability issues with the legacy formula, we propose **three new normalized metrics** as contributions of this study:
-
-**1. Infrastructure Efficiency (IE)** - Primary Proposed Metric
-
-**Conceptual Definition:** Measures how much geographic area the network makes accessible per kilometer of track infrastructure.
-
-**Significance:** Reveals whether a network achieves broad geographic coverage efficiently or requires extensive track to serve limited areas. Higher values indicate more efficient use of infrastructure investment, critical for cost-benefit analysis and infrastructure planning.
-
+**Definition:**
 ```
 IE(t) = A_reachable(t) / L
 ```
-- **Units:** km²/km (reachable area per track length)
-- **Interpretation:** Geographic coverage productivity of infrastructure
-- **Range:** Typically 0.5-3.0 for metro systems
-- **Rationale:** Isolates infrastructure performance from population and city size effects
 
-**2. Per-Capita Accessibility (PCA)** - Population-Normalized Metric
+**What it measures:** Geographic area (km²) accessible within time t per kilometer of track infrastructure.
 
-**Conceptual Definition:** Measures the accessible area available per million residents, indicating the "service footprint" each resident can access via transit.
+**Units:** km²/km (area per length)
 
-**Significance:** Captures population equity - whether all residents have equal access to transit-reachable opportunities. Essential for social equity assessment and understanding disparities in transit access across cities.
+**Interpretation Guide:**
+- IE = 1.0 → Each km of track provides access to 1 km² of area
+- IE = 2.5 → Each km of track provides access to 2.5 km² (high efficiency)
+- IE = 0.3 → Each km of track provides access to only 0.3 km² (low efficiency)
 
+**Why this metric matters:**
+- **Infrastructure ROI**: Shows geographic coverage return per km of expensive track
+- **Planning tool**: Identifies whether expansions should focus on new coverage vs. density
+- **Design diagnosis**: Low IE may indicate over-extension or sprawling network design
+
+**Real-world application:** If Berlin achieves IE = 2.5 km²/km while NYC achieves 0.3 km²/km, Berlin gets **8× more area coverage per infrastructure dollar invested**.
+
+**Writing tip:** When describing IE results, always explain WHY one city has higher efficiency (compact form, dense station spacing, targeted corridors) rather than just presenting numbers.
+
+#### 7.2.2 Per-Capita Accessibility (PCA)
+
+**Definition:**
 ```
 PCA(t) = A_reachable(t) / (P / 1,000,000)
 ```
-- **Units:** km²/million people
-- **Interpretation:** Service area available per million residents
-- **Range:** Typically 10-200 km²/M
-- **Rationale:** Normalizes by population to compare service levels across cities
 
-**3. Density-Normalized Coverage (DNC)** - Compound Normalization
+**What it measures:** Geographic area (km²) accessible via transit per million residents.
 
-**Conceptual Definition:** Measures network efficiency after normalizing for BOTH city geographic size and population density, enabling fair comparison across cities of vastly different scales.
+**Units:** km²/M (area per million people)
 
-**Significance:** Removes confounding effects of city size and population to reveal true infrastructure productivity. The most robust metric for cross-city comparison as it accounts for all major structural differences.
+**Interpretation Guide:**
+- PCA = 50 km²/M → Each million residents can access 50 km² of the city
+- PCA = 100 km²/M → Double the per-capita access (either more area OR fewer people)
+- Higher PCA → More equitable access OR lower population density
 
+**Why this metric matters:**
+- **Social equity**: Reveals whether all residents have equal access to opportunities
+- **Service fairness**: High population shouldn't mean low per-capita access
+- **Quality of life**: More accessible area means more job/service choices per person
+
+**Critical distinction:** PCA is **NOT** proportional to network size. NYC has the largest network but lowest PCA because its huge population (8.34M) dilutes per-capita benefits.
+
+**Writing tip:** When discussing PCA, always contextualize with population size. "Berlin's higher PCA (96 km²/M) reflects its smaller population (3.85M) enjoying moderate area coverage, versus NYC's larger population (8.34M) sharing extensive but diluted access."
+
+#### 7.2.3 Density-Normalized Coverage (DNC)
+
+**Definition:**
 ```
 DNC(t) = (A_reachable(t) / A_city) / (L / P_millions)
 
 Expanded form:
 DNC(t) = (A_reachable(t) / A_city) × (P_millions / L)
 ```
-- **Units:** Dimensionless ratio
-- **Interpretation:** Coverage efficiency accounting for city scale and density
-- **Range:** Typically 0.001-0.03
-- **Rationale:** Combines geographic and demographic normalization for universal comparability
 
-**4. Legacy SME** - For Backward Compatibility
-```
-SME_legacy(t) = A_reachable(t) / (L × P_millions)
-```
-- Retained for comparison with earlier iterations of this research
-- **Not recommended** for primary analysis due to dimensional inconsistency
+**What it measures:** Network efficiency after removing confounding effects of city size and population density.
 
-**Methodological Contribution:**
-These metrics represent a novel framework for comparing transit accessibility across cities with vastly different scales, densities, and urban forms. Unlike single-formula approaches, this multi-metric framework provides complementary perspectives on infrastructure productivity, population service, and normalized coverage.
+**Units:** Dimensionless ratio (no units)
 
-### 7.3 Reachability Analysis
+**Interpretation Guide:**
+- DNC is a **relative efficiency score**
+- Higher DNC → Better infrastructure productivity relative to city scale
+- Enables fair comparison between NYC (784 km², 8.3M) and Berlin (892 km², 3.9M)
 
-**Time Thresholds Tested:** 20, 30, 45, 60, 75, 90 minutes
+**Why this normalization is crucial:**
 
-**For each time threshold t:**
+DNC combines two normalization steps:
+1. **Geographic normalization**: (A_reachable / A_city)
+   - What fraction of the city's total area is accessible?
+   - Controls for city size differences
 
-1. **Compute All-Pairs Shortest Paths**
-   - Algorithm: Dijkstra's with edge weights = travel times
-   - Result: Travel time matrix T where T[i,j] = time from station i to j
+2. **Infrastructure density normalization**: (L / P_millions)
+   - How much track exists per million residents?
+   - Controls for population size and infrastructure investment
 
-2. **Determine Reachable Set**
+**Key insight:** DNC reveals whether efficiency differences are due to:
+- **Urban form** (compact vs. sprawling) → affects A_reachable/A_city
+- **Infrastructure strategy** (dense vs. sparse) → affects L/P_millions
+- OR both
+
+**Writing tip:** When presenting DNC results, explain that it "levels the playing field" by accounting for all confounding factors. Berlin's higher DNC (0.0445) vs. NYC (0.0221) means Berlin is **genuinely more efficient** even after controlling for size and population.
+
+### 7.3 Computation Methodology
+
+**Step-by-Step Process:**
+
+1. **Calculate All-Pairs Shortest Paths**
    ```
-   R_i(t) = {j : T[i,j] ≤ t}
+   For each station pair (i, j):
+       T[i,j] = shortest travel time from i to j using network graph
    ```
-   Set of stations reachable from i within time t
+   - Algorithm: Dijkstra's shortest path
+   - Edge weights: scheduled travel times from GTFS
+   - Result: N × N travel time matrix
 
-3. **Calculate Reachability Metrics**
-   - Average reachable stations: mean(|R_i(t)|) across all i
-   - Reachability percentage: (Σ|R_i(t)| / N²) × 100
+2. **Identify Reachable Stations**
+   ```
+   For each time threshold t (20, 30, 45, 60, 75, 90 minutes):
+       For each station i:
+           R_i(t) = {j : T[i,j] ≤ t}  # Set of reachable stations
+   ```
 
-### 7.4 Reachable Area Estimation
+3. **Estimate Reachable Area**
+   ```python
+   # For a representative station with median reachability
+   representative_station = find_station_with_median_reachability(t)
+   reachable_set = R_representative(t)
+   
+   # Get coordinates of all reachable stations
+   coordinates = [(lat_j, lon_j) for j in reachable_set]
+   
+   # Compute convex hull area
+   hull = ConvexHull(coordinates)
+   A_reachable(t) = hull.area  # in km²
+   ```
 
-**Method:** Convex hull approximation
+4. **Calculate Metrics**
+   ```python
+   IE(t) = A_reachable(t) / L
+   PCA(t) = A_reachable(t) / (P / 1_000_000)
+   DNC(t) = (A_reachable(t) / A_city) / (L / P_millions)
+   ```
 
-For a representative station with average reachability:
-```python
-reachable_stations = R_representative(t)
-coordinates = [(lat_j, lon_j) for j in reachable_stations]
-area = convex_hull(coordinates).area  # km²
-```
+**Time Thresholds Explained:**
+- **20-30 min**: Typical commute tolerance, local accessibility
+- **45-60 min**: Medium-distance trips, city-wide access
+- **75-90 min**: Long trips, full network reach
 
-**Fallback:** If scipy unavailable, use proxy: area ≈ 2 × |R_i(t)|
+### 7.4 Results Interpretation Framework
 
-### 7.5 City Parameters
+**How to write about IE results:**
 
-| City | Population (millions) | Area (km²) | Track Length (km) |
-|------|----------------------|------------|-------------------|
-| NYC | 8.34 | 783.8 | 380.17 |
-| Berlin | 3.85 | 891.8 | 153.27 |
-| Singapore | 5.45 | 734.3 | 231.63 |
+Template: "Berlin achieves IE of [value] km²/km at the [time] threshold, indicating that each kilometer of track infrastructure provides access to [value] square kilometers of urban area. This is [X]× higher than NYC ([value] km²/km), primarily due to [explain urban form difference: compact vs. sprawling, station density, network design]."
 
-### 7.6 Metric Interpretation Guide
+Example: "Berlin achieves IE of 2.41 km²/km at the 60-minute threshold, indicating that each kilometer of track infrastructure provides access to 2.41 square kilometers of urban area. This is 8.6× higher than NYC (0.28 km²/km), primarily due to Berlin's compact urban core (153 km network serving 892 km² city) versus NYC's sprawling metropolitan coverage (1,631 km network across 784 km² with low-density outer boroughs)."
 
-**Infrastructure Efficiency (IE):**
-- IE = 1.0 → Each km of track serves 1 km² area
-- NYC: ~0.3 → Dense network, limited geographic spread
-- Singapore: ~1.5 → Efficient area coverage per track
+**How to write about PCA results:**
 
-**Per-Capita Accessibility (PCA):**
-- Higher values = more service area per resident
-- Compact cities (Singapore) have lower PCA but better density
-- Sprawling cities (NYC) may show higher PCA but lower efficiency
+Template: "Berlin residents enjoy PCA of [value] km²/M at [time] minutes, meaning each million residents can access [value] square kilometers of the city via transit. This [comparison to other cities], reflecting [explain population and urban form factors]."
 
-**Density-Normalized Coverage (DNC):**
-- Accounts for both city size AND population density
-- Best metric for comparing cities of vastly different scales
-- Dimensionless allows universal comparison
+Example: "Berlin residents enjoy PCA of 95.8 km²/M at 60 minutes, meaning each million residents can access nearly 96 square kilometers of the city via transit. This is 3.5× higher than NYC (27.5 km²/M), reflecting Berlin's smaller population (3.85M vs. 8.34M) and moderate network coverage creating higher per-capita accessibility despite NYC's larger absolute reachable area."
 
-### 7.7 Comparative Analysis: Metric Rankings Explained
+**How to write about DNC results:**
 
-#### Infrastructure Efficiency (IE) - Why NYC is Lowest
+Template: "After normalizing for both city size and population density, [city] achieves DNC of [value], [comparison], indicating that [interpretation of genuine efficiency difference based on urban form]."
 
-**NYC's Lower IE (0.28-0.85 km²/km) vs. Berlin (0.48-2.51):**
+Example: "After normalizing for both city size and population density, Berlin achieves DNC of 0.0445, 2× higher than NYC (0.0221), indicating that Berlin's compact European urban form genuinely enables more efficient infrastructure productivity than NYC's sprawling American metropolitan pattern."
 
-The counterintuitive result - NYC's massive 1,631 km network has LOWER efficiency than Berlin's 153 km - reflects fundamental design philosophies:
+### 7.5 Cross-City Comparison Guidelines
 
-**NYC Characteristics:**
-- **Sprawling coverage**: Network spans 5 boroughs across large metropolitan area
-- **Long radial lines**: Routes extend to outer Queens, Bronx, Brooklyn (low-density areas)
-- **Regional accessibility priority**: Designed to connect distant neighborhoods, not maximize efficiency
-- **Infrastructure allocation**: Much track serves suburban-density areas with limited area coverage
-- **Mathematical result**: Large denominator (1,631 km) relative to numerator (area covered)
+**When writing comparative analysis:**
 
-**Berlin Characteristics:**
-- **Compact concentration**: 153 km focused on dense urban core
-- **Dense station spacing**: 0.90 km/station vs. NYC's 4.56 km/station
-- **Area coverage priority**: Each km of track serves dense, continuous urban fabric
-- **Efficient geometry**: Short, interconnected lines cover same area with less track
-- **Mathematical result**: Small denominator (153 km) relative to numerator (area covered)
+1. **Always explain the "why" behind differences:**
+   - ✅ "Berlin's higher IE stems from its compact 153 km U-Bahn serving a dense 892 km² core"
+   - ❌ "Berlin has higher IE than NYC" (too vague)
 
-**Key Insight:** IE reveals **design philosophy**, not quality. NYC accepts lower efficiency to achieve borough-wide coverage appropriate for American sprawling metropolitan form.
+2. **Contextualize with urban form:**
+   - Mention city area, population, network length
+   - Explain historical development (organic vs planned)
+   - Note density differences
 
-#### Per-Capita Accessibility (PCA) - Population Effects
+3. **Avoid value judgments:**
+   - ✅ "NYC's lower IE reflects its design priority for regional connectivity over infrastructure efficiency"
+   - ❌ "NYC's network is inefficient" (misleading - it serves different goals)
 
-**NYC's Lower PCA (5.4-38.3 km²/M) vs. Berlin (19.1-99.8):**
+4. **Use all three metrics together:**
+   - IE shows infrastructure productivity
+   - PCA shows population equity
+   - DNC confirms if differences are real or size artifacts
 
-Despite larger absolute reachable area, NYC's higher population reduces per-capita accessibility:
+### 7.6 Key Findings Summary (Example Writing)
 
-**NYC Trade-off:**
-- 8.34 million people ÷ 459.8 km² (60-min reachable) = 55 km²/M people
-- Extensive network serves more people, diluting per-capita benefit
-- High-density boroughs concentrate population in limited area
+**This section provides example text that can be adapted:**
 
-**Berlin Advantage:**
-- 3.85 million people ÷ 369.3 km² (estimated 60-min) = 96 km²/M people
-- Smaller population means more service area per capita
-- Lower density spreads population over served area
+"Analysis of transit accessibility across NYC, Berlin, and Singapore reveals distinct efficiency profiles shaped by urban form and design priorities:
 
-**Key Insight:** PCA shows **population equity** - not all residents have equal access to transit-reachable areas.
+**Infrastructure Efficiency** demonstrates Berlin's leadership (IE: 0.48-2.51 km²/km) compared to Singapore (0.39-1.84 km²/km) and NYC (0.13-0.28 km²/km). Berlin's compact 153 km network concentrated in a dense urban core achieves 2-3× more area coverage per kilometer of track than other cities. NYC's lower IE reflects its sprawling 1,631 km network serving a dispersed metropolitan region including low-density outer boroughs.
 
-#### Density-Normalized Coverage (DNC) - Universal Fairness
+**Per-Capita Accessibility** similarly favors Berlin (19-100 km²/M) over Singapore (13-62 km²/M) and NYC (5-38 km²/M). Berlin's smaller population (3.85M)享 enjoys disproportionate benefits from moderate network coverage, while NYC's large population (8.34M) dilutes per-capita accessibility despite its extensive infrastructure.
 
-**Why DNC is Most Robust:**
-
-DNC normalizes BOTH city size and population:
-```
-DNC = (Coverage Fraction) / (Per-Capita Infrastructure)
-    = (A_reachable / A_city) / (L / P_millions)
-```
-
-**NYC's Persistent Low Ranking (0.0041-0.0306):**
-- Even after normalization, NYC remains lowest
-- Meaning: The sprawling network is genuinely less efficient even accounting for scale
-- 1,631 km serves 8.34M people across 629 km² → inherently lower productivity
-- **Result**: Urban form fundamentally limits efficiency
-
-**Berlin's Maintained High Ranking (0.0086-0.0463):**
-- Normalization confirms Berlin's efficiency is real, not just size artifact
-- 153 km serves 3.85M people across 892 km² → high productivity per unit
-- **Result**: Compact form enables genuine efficiency
-
-**Key Insight:** DNC confirms that ranking differences are **structural** (urban form) not **methodological artifacts**.
-
-**Full Pairwise Calculation:**
-- All N × (N-1) / 2 station pairs
-- Actual shortest path times using network graph
-- Statistical analysis: max, mean, median, percentiles
-
-**Purpose:**
-- Validate reachability thresholds
-- Understand network span characteristics
-- Cross-check SME calculations
+**Density-Normalized Coverage** confirms these efficiency differences are structural rather than artifactual. After controlling for city size and population density, Berlin maintains its lead (DNC: 0.0086-0.0463), with Singapore close behind (0.0085-0.0402) and NYC trailing (0.0041-0.0306). This indicates that urban form - not just network size - fundamentally determines infrastructure productivity."
 
 ---
 
 ## 8. Implementation Details
 
-### 8.1 Software and Libraries
+### 7.1 Software and Libraries
 
 **Language:** Python 3.8+
 
@@ -901,98 +890,11 @@ G.add_weighted_edges_from(
 
 **Key Finding:** Singapore demonstrates highest resilience across all attack types, while NYC shows particular vulnerability to random failures but better resistance to degree-based attacks.
 
-### 9.3 System Level Mobility Efficiency
+---
 
-| Time Threshold | NYC | Berlin | Singapore |
-|----------------|-----|--------|-----------|
-| **20 min** | 1,047 | 2,663 | 2,743 |
-| **30 min** | 1,371 | 3,994 | 3,204 |
-| **45 min** | 1,840 | 7,772 | 6,204 |
-| **60 min** | 2,349 | 9,388 | 7,919 |
-| **90 min** | 2,364 | 9,459 | 8,233 |
+## 10. Limitations and Assumptions
 
-**Key Finding:** Berlin achieves highest SME at medium-to-long time thresholds (30-90 min), attributed to dense station spacing (0.90 km/station) in compact urban core.
-
-#### 9.3.1 NYC's Low SME: Structural Analysis
-
-**Observation:** NYC's SME values are substantially lower than Berlin and Singapore across all time thresholds despite having the largest network.
-
-**Root Cause: Infrastructure-to-Population Ratio**
-
-The SME denominator penalizes extensive networks:
-
-```
-SME(t) = A_reachable(t) / (L / P × 1000)
-```
-
-**Comparative Infrastructure Efficiency:**
-
-| City | Route Length (L) | Population (P) | L/P × 1000 | People per km |
-|------|------------------|----------------|------------|---------------|
-| **NYC** | 1,631.7 km | 8,336,817 | **0.196** | 5,110 |
-| **Berlin** | 153.3 km | 3,850,809 | **0.040** | 25,137 |
-| **Singapore** | 184.7 km | 5,453,600 | **0.034** | 29,478 |
-
-**NYC's L/P ratio is 4.9× larger than Berlin and 5.8× larger than Singapore.**
-
-This means NYC must achieve ~5× the reachable area to match their SME scores.
-
-**Structural Factors:**
-
-1. **Over-Extension Relative to Population**
-   - NYC: 10.6× more track than Berlin, but only 2.2× more people
-   - Massive route length serves dispersed metropolitan region
-   - Long radial routes to outer boroughs (Queens, Bronx, Brooklyn)
-
-2. **Low Station Density**
-   - NYC: 4.56 km per station (largest spacing)
-   - Berlin: 0.90 km per station (5× denser)
-   - Singapore: 1.51 km per station
-   
-   **Impact:** In 30 minutes, Berlin passengers can reach many closely-spaced stations (large geographic area), while NYC passengers spend more time between fewer, far-apart stations (smaller effective area coverage).
-
-3. **Geographic Sprawl**
-   - NYC metropolitan area: 778.2 km²
-   - Network serves low-density outer neighborhoods
-   - Much infrastructure dedicated to suburban connectivity
-   
-4. **Historical Development Pattern**
-   - Organic growth over 120 years
-   - Three merged systems (IRT, BMT, IND) with overlapping routes
-   - Built to connect far-flung boroughs in pre-automobile era
-   - Subsequent sprawl reduced density efficiency
-
-**Illustrative Calculation (60-minute threshold):**
-
-```
-NYC:
-  A_reachable ≈ 460 km²
-  SME = 460 / 0.196 = 2,349 ✓
-
-Berlin:
-  A_reachable ≈ 375 km²
-  SME = 375 / 0.040 = 9,375 ✓
-```
-
-Despite NYC's larger absolute reachable area (460 vs 375 km²), the massive L/P denominator yields lower SME.
-
-**Interpretation:**
-
-NYC's low SME reflects **different design priorities**, not inferior performance:
-
-- **Trade-off:** Regional connectivity vs. local efficiency
-- **Goal:** Serve entire 778 km² metropolitan area, not just dense core
-- **Context:** American urban form with lower density, auto-oriented development
-
-**Berlin/Singapore high SME reflects:**
-- Concentrated infrastructure in dense urban cores
-- Compact European/Asian urban form
-- Higher efficiency per km of track
-
-**Key Insight:**  
-SME measures **infrastructure efficiency**, not **total accessibility**. NYC provides connectivity to 2.2× more people than Berlin across a vast region, but at lower efficiency per km of investment. This is a **structural consequence of urban form and network extent**, not a design failure.
-
-### 9.4 Travel Time Characteristics
+### 9.3 Travel Time Characteristics
 
 | City | Max Time | Mean Time | Median Time |
 |------|----------|-----------|-------------|
