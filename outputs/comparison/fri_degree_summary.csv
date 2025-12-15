@@ -1,0 +1,4 @@
+City,"Overall FRI (Degree, transfers)","Overall FRI (Degree, trains)",FRI @ k=5 (transfers),FRI @ k=5 (trains),Scenarios
+NYC,0.8982,0.8541,0.8376,0.8170,8
+Berlin,0.8257,0.8101,0.8240,0.8098,8
+Singapore,0.8518,0.8306,0.8384,0.8188,8

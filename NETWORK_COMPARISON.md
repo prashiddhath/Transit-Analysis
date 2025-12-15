@@ -95,6 +95,10 @@ Comparative analysis of three major urban transit systems using Functional Resil
 ### Infrastructure Efficiency (IE) - Primary Metric
 *Geographic coverage per unit of infrastructure*
 
+**What it measures:** How much geographic area the network makes accessible per kilometer of track. Higher values indicate more efficient use of infrastructure investment.
+
+**Why it matters:** Reveals whether a network achieves broad geographic coverage efficiently or requires extensive track to serve limited areas. Critical for infrastructure planning and ROI assessment.
+
 | Time | NYC | Berlin | Singapore | Leader |
 |------|-----|--------|-----------|--------|
 | **20 min** | 0.12 | 0.48 | 0.39 | Berlin |
@@ -104,7 +108,14 @@ Comparative analysis of three major urban transit systems using Functional Resil
 | **75 min** | 0.78 | 2.51 | 1.76 | Berlin |
 | **90 min** | 0.85 | 2.51 | 1.84 | Berlin |
 
-**Formula:** IE(t) = A_reachable(t) / L (km²/km)
+**Formula:** 
+```
+IE(t) = A_reachable(t) / L
+```
+Where:
+- A_reachable(t) = Geographic area reachable within time threshold t (km²)
+- L = Total route length (km)
+- Units: km²/km
 
 **Interpretation:**
 - Berlin achieves 2-3x the area coverage per km of track
@@ -113,6 +124,10 @@ Comparative analysis of three major urban transit systems using Functional Resil
 
 ### Per-Capita Accessibility (PCA)
 *Service area per million residents*
+
+**What it measures:** How much accessible area is available per million residents. Indicates the "service footprint" each resident can access via transit.
+
+**Why it matters:** Captures population equity - whether all residents have equal access to transit-reachable opportunities. Essential for social equity and urban planning.
 
 | Time | NYC (km²/M) | Berlin (km²/M) | Singapore (km²/M) | Leader |
 |------|-------------|----------------|-------------------|--------|
@@ -123,7 +138,14 @@ Comparative analysis of three major urban transit systems using Functional Resil
 | **75 min** | 35.0 | 99.8 | 59.4 | Berlin |
 | **90 min** | 38.3 | 99.8 | 62.0 | Berlin |
 
-**Formula:** PCA(t) = A_reachable(t) / (P / 1,000,000)
+**Formula:**
+```
+PCA(t) = A_reachable(t) / (P / 1,000,000)
+```
+Where:
+- A_reachable(t) = Geographic area reachable within time threshold t (km²)
+- P = City population (people)
+- Units: km² per million people
 
 **Interpretation:**
 - Berlin provides 2-3x more accessible area per capita
@@ -132,6 +154,10 @@ Comparative analysis of three major urban transit systems using Functional Resil
 
 ### Density-Normalized Coverage (DNC)
 *Dimensionless metric accounting for city scale and population*
+
+**What it measures:** Network efficiency after normalizing for BOTH city geographic size and population density. Enables fair comparison across cities of vastly different scales.
+
+**Why it matters:** Removes confounding effects of city size and population to reveal true infrastructure productivity. The most robust metric for cross-city comparison.
 
 | Time | NYC | Berlin | Singapore | Leader |
 |------|-----|--------|-----------|--------|
@@ -142,7 +168,19 @@ Comparative analysis of three major urban transit systems using Functional Resil
 | **75 min** | 0.0279 | 0.0463 | 0.0385 | Berlin |
 | **90 min** | 0.0306 | 0.0463 | 0.0402 | Berlin |
 
-**Formula:** DNC(t) = (A_reachable / A_city) / (L / P_millions)
+**Formula:**
+```
+DNC(t) = (A_reachable(t) / A_city) / (L / P_millions)
+
+Expanded form:
+DNC(t) = (A_reachable(t) / A_city) × (P_millions / L)
+```
+Where:
+- A_reachable(t) = Geographic area reachable within time threshold t (km²)
+- A_city = Total city area (km²)
+- L = Total route length (km)
+- P_millions = City population in millions
+- Units: Dimensionless ratio
 
 **Interpretation:**
 - Accounts for both city size AND population density
@@ -167,6 +205,93 @@ These three metrics (IE, PCA, DNC) represent a novel framework proposed in this 
 - **IE:** Infrastructure productivity (geographic)
 - **PCA:** Population equity (demographic)
 - **DNC:** Universal comparison (normalized)
+
+### Metric Analysis: Why the Rankings?
+
+#### Infrastructure Efficiency (IE) - Why NYC is Lowest
+
+**NYC's Lower IE (0.28-0.85 km²/km):**
+- **Sprawling network**: 1,631.7 km of track across 5 boroughs
+- **Long radial lines**: Extensive routes to outer areas (Queens, Bronx, Brooklyn)
+- **Low-density coverage**: Much track runs through suburban-density areas
+- **Design for regional reach**: Optimized for coverage extent, not efficiency per km
+- **Result**: More track needed per unit of area covered
+
+**Berlin's Higher IE (0.48-2.51 km²/km):**
+- **Compact network**: 153.3 km concentrated in dense urban core
+- **Short, interconnected lines**: Dense station spacing (0.90 km/station)
+- **Concentrated urban form**: Network serves high-density central city
+- **Design for density**: Optimized for efficient area coverage
+- **Result**: Each km of track serves larger geographic area
+
+**Singapore's Balanced IE (0.39-1.84 km²/km):**
+- **Strategic corridors**: 184.7 km along major transit axes
+- **Planned efficiency**: Purpose-built network with optimal spacing
+- **Linear island geography**: Network follows natural corridor patterns
+- **Result**: Moderate efficiency between NYC sprawl and Berlin density
+
+**Key Insight:** IE reveals **design philosophy** - NYC prioritizes regional accessibility over infrastructure efficiency, while Berlin optimizes efficiency within a compact footprint.
+
+#### Per-Capita Accessibility (PCA) - Population-Normalized Service
+
+**NYC's Lower PCA (5.4-38.3 km²/M):**
+- **Large population**: 8.34 million people
+- **Dilution effect**: Same reachable area divided among more residents
+- **High-density boroughs**: Many people concentrated in limited area
+- **Trade-off**: Extensive network but lower per-capita service area
+
+**Berlin's Higher PCA (19.1-99.8 km²/M):**
+- **Smaller population**: 3.85 million people
+- **Concentration benefit**: Moderate area serves fewer people
+- **Result**: Each million residents has access to much larger area
+
+**Singapore's Moderate PCA (13.1-62.0 km²/M):**
+- **Mid-sized population**: 5.45 million people
+- **Balanced approach**: Network scaled appropriately for population
+
+**Key Insight:** PCA shows **population equity** - Berlin residents have 2-3× more accessible area per capita, reflecting different density and urban form.
+
+#### Density-Normalized Coverage (DNC) - Universal Comparison
+
+**Why DNC Enables Fair Comparison:**
+
+DNC accounts for BOTH city size AND population by normalizing:
+1. Coverage fraction: `A_reachable / A_city` (what % of city is accessible)
+2. Per-capita infrastructure: `L / P_millions` (km of track per million people)
+
+**NYC's Lower DNC (0.0041-0.0306):**
+- Despite massive network (1,631.7 km), covers only small fraction of large area (629.2 km²)
+- High infrastructure per capita (195.7 km/M people) but serves sprawling region
+- **Meaning**: Low efficiency even after normalizing for population and scale
+
+**Berlin's Higher DNC (0.0086-0.0463):**
+- Compact network (153.3 km) covers significant fraction of city (892 km²)
+- Low infrastructure per capita (39.8 km/M people) but highly productive
+- **Meaning**: Each km of infrastructure highly effective at covering city
+
+**Singapore's Balanced DNC (0.0085-0.0402):**
+- Network (184.7 km) well-matched to city size (734.3 km²)
+- Moderate infrastructure per capita (33.9 km/M people)
+- **Meaning**: Efficient planned system balancing coverage and investment
+
+**Key Insight:** DNC reveals **true efficiency** after accounting for all confounding factors - NYC's apparent large network is actually less efficient when city scale and population are properly normalized.
+
+### Design Philosophy Implications
+
+**NYC: Regional Connectivity Strategy**
+- Accepts lower efficiency to achieve borough-wide coverage
+- Prioritizes reaching outer areas over infrastructure productivity
+- Appropriate for sprawling American metropolitan form
+
+**Berlin: Compact Efficiency Strategy**
+- Maximizes efficiency within dense urban core
+- Every km of track highly productive
+- Appropriate for compact European city form
+
+**Singapore: Planned Optimization**
+- Balanced approach to efficiency and coverage
+- Modern network optimized for island geography
+- Demonstrates benefits of integrated planning
 
 ---
 

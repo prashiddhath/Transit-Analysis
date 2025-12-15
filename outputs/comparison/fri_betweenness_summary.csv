@@ -1,0 +1,4 @@
+City,"Overall FRI (Betweenness, transfers)","Overall FRI (Betweenness, trains)",FRI @ k=5 (transfers),FRI @ k=5 (trains),Scenarios
+NYC,0.8589,0.8340,0.8282,0.8134,8
+Berlin,0.8268,0.8090,0.8066,0.7924,8
+Singapore,0.8696,0.8511,0.8191,0.8135,8
