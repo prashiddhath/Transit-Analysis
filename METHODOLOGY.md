@@ -227,57 +227,61 @@ Following Derrible & Kennedy (2010):
 ## 5. Network Complexity Indicators (Derrible & Kennedy)
 
 ### 5.1 Coverage (σ)
-**Definition:** Network size relative to city area
+**Definition:** Station coverage as fraction of city area
 
 ```
-σ = L / A
+σ = (n_s × π × R²) / A
 ```
 Where:
-- L = Total route length (km)
+- n_s = Total number of stations
+- R = Station catchment radius = 0.5 km (500 meters)
 - A = City area (km²)
+- π × R² = 0.785 km² (circular catchment area per station)
 
-**Interpretation:** Higher σ indicates more extensive coverage density.
+**Interpretation:** What fraction of the city is within walking distance (500m) of a station. Higher σ indicates better station coverage.
 
 **Results:**
-- NYC: σ = 0.361 (most extensive)
+- NYC: σ = 0.447 (best coverage - 44.7% of city within 500m of a station)
 - Berlin: σ = 0.150 
 - Singapore: σ = 0.130
 
 ### 5.2 Directness (τ)
-**Definition:** Maximum transfers required to traverse network
+**Definition:** Ratio of lines to maximum required transfers
 
 ```
-τ = (L / l) + δ
+τ = n_L / δ
 ```
 Where:
-- l = Average line length
-- δ = Maximum number of transfers between any two stations
+- n_L = Number of lines in the network
+- δ = Maximum number of line transfers needed between any pair of transfer/terminal stations
 
-**Interpretation:** Lower τ indicates more direct routing with fewer transfers.
+**Interpretation:** Higher τ indicates more direct routing (fewer transfers relative to system size). Lower τ means complex routing requiring many transfers.
 
 **Results:**
-- Singapore: τ = 2.67 (most direct)
-- Berlin: τ = 4.50
-- NYC: τ = 12.50 (most complex)
+- Singapore: τ = 2.67 (8 lines / 3 max transfers - most direct)
+- Berlin: τ = 4.50 (9 lines / 2 max transfers)
+- NYC: τ = 12.50 (25 lines / 2 max transfers - most complex)
 
 ### 5.3 Connectivity (ρ)
-**Definition:** Edge usage across multiple lines
+**Definition:** Integration through transfer possibilities and shared infrastructure
 
 ```
-ρ = (e^s + 2e^m) / (v^t + v^e)
+ρ = (v_c^t - e^m) / v^t
 ```
 Where:
-- e^s = Single-use edges (one line only)
-- e^m = Multiple-use edges (≥2 lines)
-- v^t = Transfer stations
-- v^e = Terminal stations
+- v_c^t = Sum of transfer possibilities = Σ(l_i - 1) for each transfer station with l_i lines
+  - Station with 2 lines → 1 transfer possibility
+  - Station with 3 lines → 2 transfer possibilities
+  - Station with 4 lines → 3 transfer possibilities
+- e^m = Number of multiple-use edges (track segments shared by ≥2 lines)
+- v^t = Number of transfer stations
 
-**Interpretation:** Higher ρ indicates better integration through shared infrastructure.
+**Interpretation:** Higher ρ indicates better network integration through transfer hubs and shared infrastructure.
 
 **Results:**
-- NYC: ρ = 1.22 (highest integration)
-- Singapore: ρ = 1.00 (linear structure)
-- Berlin: ρ = 0.85
+- NYC: ρ = 1.22 (highest integration - 221 transfer stations, 281 shared edges)
+- Singapore: ρ = 1.00 (linear structure - 23 transfer stations, 2 shared edges)
+- Berlin: ρ = 0.85 (moderate integration - 27 transfer stations, 14 shared edges)
 
 ### 5.4 Predicted Boardings per Capita
 D&K regression model for ridership prediction:
